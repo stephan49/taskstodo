@@ -27,19 +27,21 @@ def get_all_tasklists(creds, num_lists):
         print(err)
 
 
-def get_tasklist(creds, taskl):
+def get_tasklist(creds, task_list):
     """
     Print out specific task list.
     """
 
     try:
         service = build('tasks', 'v1', credentials=creds)
-        results = service.tasklists().get(tasklist=taskl).execute()
-        title = results.get('title')
-        updated = results.get('updated')
+        results = service.tasklists().get(tasklist=task_list).execute()
+        task_title = results.get('title')
+        task_updated = results.get('updated')
 
-        print('Title: {0}'.format(title))
-        print('Updated: {0}'.format(updated))
+        print('Title: {0}'.format(task_title))
+        print('Updated: {0}'.format(task_updated))
+    except HttpError as err:
+        print(err)
 
 
 def create_tasklist(creds, title):
