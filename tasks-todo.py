@@ -44,6 +44,8 @@ def main():
                         help='list all task lists (default: %(const)s)')
     parser.add_argument('-l', '--task-list', metavar='ID', nargs=1, type=str,
                         help='list specific task list')
+    parser.add_argument('-c', '--create-task-list', metavar='name', nargs=1,
+                        type=str, help='create task list with specified name')
     args = parser.parse_args()
 
     creds = auth_user()
@@ -52,6 +54,8 @@ def main():
         tasklists.get_all_tasklists(creds, args.all_task_lists)
     if args.task_list:
         tasklists.get_tasklist(creds, args.task_list[0])
+    if args.create_task_list:
+        tasklists.create_tasklist(creds, args.create_task_list[0])
 
 
 if __name__ == '__main__':

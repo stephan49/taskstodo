@@ -40,5 +40,20 @@ def get_tasklist(creds, taskl):
 
         print('Title: {0}'.format(title))
         print('Updated: {0}'.format(updated))
+
+
+def create_tasklist(creds, title):
+    """
+    Create a new task list.
+    """
+
+    try:
+        service = build('tasks', 'v1', credentials=creds)
+        tasklist = {"title": title}
+        results = service.tasklists().insert(body=tasklist).execute()
+        task_title = results.get('title')
+        task_id = results.get('id')
+
+        print('Task list created: {0} (ID: {1})'.format(task_title, task_id))
     except HttpError as err:
         print(err)
