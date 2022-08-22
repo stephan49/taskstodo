@@ -23,6 +23,8 @@ parser.add_argument('-c', '--create-task-list', metavar='name', nargs=1,
                     type=str, help='create task list with specified name')
 parser.add_argument('-d', '--delete-task-list', metavar='ID', nargs=1,
                     type=str, help='delete specified task list')
+parser.add_argument('-v', '--verbose', action='store_true',
+                    help='show verbose messages')
 args = parser.parse_args()
 
 

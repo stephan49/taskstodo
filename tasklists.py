@@ -5,6 +5,8 @@ from __future__ import print_function
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+import taskstodo
+
 
 def get_all_tasklists(creds, num_lists):
     """
@@ -24,7 +26,10 @@ def get_all_tasklists(creds, num_lists):
         for item in items:
             print('  - {0} (ID: {1})'.format(item['title'], item['id']))
     except HttpError as err:
-        print(err)
+        if taskstodo.args.verbose:
+            print(err)
+        else:
+            print(err._get_reason())
 
 
 def get_tasklist(creds, task_list):
@@ -41,7 +46,10 @@ def get_tasklist(creds, task_list):
         print('Title: {0}'.format(task_title))
         print('Updated: {0}'.format(task_updated))
     except HttpError as err:
-        print(err)
+        if taskstodo.args.verbose:
+            print(err)
+        else:
+            print(err._get_reason())
 
 
 def create_tasklist(creds, title):
@@ -58,7 +66,10 @@ def create_tasklist(creds, title):
 
         print('Task list created: {0} (ID: {1})'.format(task_title, task_id))
     except HttpError as err:
-        print(err)
+        if taskstodo.args.verbose:
+            print(err)
+        else:
+            print(err._get_reason())
 
 
 def delete_tasklist(creds, task_list):
@@ -70,4 +81,7 @@ def delete_tasklist(creds, task_list):
         service = build('tasks', 'v1', credentials=creds)
         service.tasklists().delete(tasklist=task_list).execute()
     except HttpError as err:
-        print(err)
+        if taskstodo.args.verbose:
+            print(err)
+        else:
+            print(err._get_reason())
