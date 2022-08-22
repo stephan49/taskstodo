@@ -59,3 +59,15 @@ def create_tasklist(creds, title):
         print('Task list created: {0} (ID: {1})'.format(task_title, task_id))
     except HttpError as err:
         print(err)
+
+
+def delete_tasklist(creds, task_list):
+    """
+    Delete a task list.
+    """
+
+    try:
+        service = build('tasks', 'v1', credentials=creds)
+        service.tasklists().delete(tasklist=task_list).execute()
+    except HttpError as err:
+        print(err)
