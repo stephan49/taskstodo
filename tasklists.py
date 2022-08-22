@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-from __future__ import print_function
-
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
