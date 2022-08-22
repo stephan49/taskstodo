@@ -12,6 +12,19 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 
 SCOPES = ['https://www.googleapis.com/auth/tasks']
 
+# Parse command line arguments
+parser = argparse.ArgumentParser(description="Manage Google Tasks")
+parser.add_argument('-a', '--all-task-lists', metavar='number', nargs='?',
+                    const=10, type=int,
+                    help='list all task lists (default: %(const)s)')
+parser.add_argument('-l', '--task-list', metavar='ID', nargs=1, type=str,
+                    help='list specificied task list')
+parser.add_argument('-c', '--create-task-list', metavar='name', nargs=1,
+                    type=str, help='create task list with specified name')
+parser.add_argument('-d', '--delete-task-list', metavar='ID', nargs=1,
+                    type=str, help='delete specified task list')
+args = parser.parse_args()
+
 
 def auth_user():
     """
@@ -38,18 +51,6 @@ def auth_user():
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Manage Google Tasks")
-    parser.add_argument('-a', '--all-task-lists', metavar='number', nargs='?',
-                        const=10, type=int,
-                        help='list all task lists (default: %(const)s)')
-    parser.add_argument('-l', '--task-list', metavar='ID', nargs=1, type=str,
-                        help='list specificied task list')
-    parser.add_argument('-c', '--create-task-list', metavar='name', nargs=1,
-                        type=str, help='create task list with specified name')
-    parser.add_argument('-d', '--delete-task-list', metavar='ID', nargs=1,
-                        type=str, help='delete specified task list')
-    args = parser.parse_args()
-
     creds = auth_user()
 
     if args.all_task_lists:
