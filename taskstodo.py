@@ -55,13 +55,13 @@ def main():
     creds = auth_user()
 
     if args.all_task_lists:
-        tasklists.get_all_tasklists(creds, args.all_task_lists)
+        tasklists.get_all_tasklists(creds, args.all_task_lists, args.verbose)
     if args.task_list:
-        tasklists.get_tasklist(creds, args.task_list[0])
+        tasklists.get_tasklist(creds, args.task_list[0], args.verbose)
     if args.create_task_list:
-        tasklists.create_tasklist(creds, args.create_task_list[0])
+        tasklists.create_tasklist(creds, args.create_task_list[0], args.verbose)
     if args.delete_task_list:
-        tasklists.delete_tasklist(creds, args.delete_task_list[0])
+        tasklists.delete_tasklist(creds, args.delete_task_list[0], args.verbose)
     if len(sys.argv) == 1:
         parser.print_usage()
 
