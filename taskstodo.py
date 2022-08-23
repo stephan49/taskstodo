@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import sys
 import os.path
 import argparse
 import tasklists
@@ -61,6 +62,8 @@ def main():
         tasklists.create_tasklist(creds, args.create_task_list[0])
     if args.delete_task_list:
         tasklists.delete_tasklist(creds, args.delete_task_list[0])
+    if len(sys.argv) == 1:
+        parser.print_usage()
 
 
 if __name__ == '__main__':
