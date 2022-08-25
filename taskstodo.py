@@ -10,20 +10,27 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 
 SCOPES = ['https://www.googleapis.com/auth/tasks']
+CMDS = ['list', 'task']
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description="Manage Google Tasks")
-parser.add_argument('-a', '--all-task-lists', metavar='number', nargs='?',
-                    const=10, type=int,
-                    help='list all task lists (default: %(const)s)')
-parser.add_argument('-l', '--task-list', metavar='ID', nargs=1, type=str,
-                    help='list specificied task list')
-parser.add_argument('-c', '--create-task-list', metavar='name', nargs=1,
-                    type=str, help='create task list with specified name')
-parser.add_argument('-d', '--delete-task-list', metavar='ID', nargs=1,
-                    type=str, help='delete specified task list')
-parser.add_argument('-v', '--verbose', action='store_true',
-                    help='show verbose messages')
+subparsers = parser.add_subparsers()
+
+parser_list = subparsers.add_parser(CMDS[0], help='manage task lists')
+parser_list.add_argument('-a', '--all-task-lists', metavar='number', nargs='?',
+                         const=10, type=int,
+                         help='list all task lists (default: %(const)s)')
+parser_list.add_argument('-l', '--task-list', metavar='ID', nargs=1, type=str,
+                         help='list specificied task list')
+parser_list.add_argument('-c', '--create-task-list', metavar='title', nargs=1,
+                         type=str, help='create task list with specified title')
+parser_list.add_argument('-d', '--delete-task-list', metavar='ID', nargs=1,
+                         type=str, help='delete specified task list')
+parser_list.add_argument('-v', '--verbose', action='store_true',
+                         help='show verbose messages')
+
+parser_task = subparsers.add_parser(CMDS[1], help='manage tasks')
+
 args = parser.parse_args()
 
 
@@ -54,6 +61,16 @@ def auth_user():
 def main():
     creds = auth_user()
 
+    if len(sys.argv) == 1:
+        parser.print_usage()
+        return
+    elif len(sys.argv) == 2 and sys.argv[1] == CMDS[0]:
+        parser_list.print_usage()
+        return
+    elif len(sys.argv) == 2 and sys.argv[1] == CMDS[1]:
+        parser_task.print_usage()
+        return
+
     if args.all_task_lists:
         tasklists.get_all_tasklists(creds, args.all_task_lists, args.verbose)
     if args.task_list:
@@ -62,8 +79,6 @@ def main():
         tasklists.create_tasklist(creds, args.create_task_list[0], args.verbose)
     if args.delete_task_list:
         tasklists.delete_tasklist(creds, args.delete_task_list[0], args.verbose)
-    if len(sys.argv) == 1:
-        parser.print_usage()
 
 
 if __name__ == '__main__':
