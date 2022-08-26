@@ -10,26 +10,30 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 
 SCOPES = ['https://www.googleapis.com/auth/tasks']
-CMDS = ['list', 'task']
+CMDS = ['show-lists', 'list', 'task']
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description="Manage Google Tasks")
 subparsers = parser.add_subparsers()
 
-parser_list = subparsers.add_parser(CMDS[0], help='manage task lists')
-parser_list.add_argument('-a', '--all-task-lists', metavar='number', nargs='?',
-                         const=10, type=int,
-                         help='list all task lists (default: %(const)s)')
-parser_list.add_argument('-l', '--task-list', metavar='ID', nargs=1, type=str,
-                         help='list specificied task list')
-parser_list.add_argument('-c', '--create-task-list', metavar='title', nargs=1,
-                         type=str, help='create task list with specified title')
-parser_list.add_argument('-d', '--delete-task-list', metavar='ID', nargs=1,
-                         type=str, help='delete specified task list')
+parser_show_lists = subparsers.add_parser(CMDS[0], help='show all task lists')
+parser_show_lists.add_argument('-m', '--max-results', metavar='number',
+                               default=10, type=int,
+                               help='''max number of lists to return
+                             (default: %(default)s)''')
+parser_show_lists.add_argument('-v', '--verbose', action='store_true',
+                               help='show verbose messages')
+
+parser_list = subparsers.add_parser(CMDS[1], help='manage a task list')
+parser_list.add_argument('-c', '--create', action='store_true',
+                         help='create new task list')
+parser_list.add_argument('-d', '--delete', action='store_true',
+                         help='delete existing task list')
 parser_list.add_argument('-v', '--verbose', action='store_true',
                          help='show verbose messages')
+parser_list.add_argument('title', type=str, help='title of task list to use')
 
-parser_task = subparsers.add_parser(CMDS[1], help='manage tasks')
+parser_task = subparsers.add_parser(CMDS[2], help='manage tasks')
 
 args = parser.parse_args()
 
@@ -64,21 +68,23 @@ def main():
     if len(sys.argv) == 1:
         parser.print_usage()
         return
-    elif len(sys.argv) == 2 and sys.argv[1] == CMDS[0]:
+    elif len(sys.argv) == 2 and sys.argv[1] == CMDS[1]:
         parser_list.print_usage()
         return
-    elif len(sys.argv) == 2 and sys.argv[1] == CMDS[1]:
+    elif len(sys.argv) == 2 and sys.argv[1] == CMDS[2]:
         parser_task.print_usage()
         return
 
-    if args.all_task_lists:
-        tasklists.get_all_tasklists(creds, args.all_task_lists, args.verbose)
-    if args.task_list:
-        tasklists.get_tasklist(creds, args.task_list[0], args.verbose)
-    if args.create_task_list:
-        tasklists.create_tasklist(creds, args.create_task_list[0], args.verbose)
-    if args.delete_task_list:
-        tasklists.delete_tasklist(creds, args.delete_task_list[0], args.verbose)
+    if sys.argv[1] == CMDS[0]:
+        tasklists.get_all_tasklists(creds, args.max_results, args.verbose)
+        return
+
+    if args.title and not args.create and not args.delete:
+        tasklists.get_tasklist(creds, args.title, args.verbose)
+    if args.create:
+        tasklists.create_tasklist(creds, args.title, args.verbose)
+    if args.delete:
+        tasklists.delete_tasklist(creds, args.title, args.verbose)
 
 
 if __name__ == '__main__':

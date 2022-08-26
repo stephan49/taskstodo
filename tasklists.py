@@ -4,6 +4,23 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 
+def get_tasklist_id(creds, title):
+    """
+    Get task list ID from title
+    """
+
+    try:
+        service = build('tasks', 'v1', credentials=creds)
+        results = service.tasklists().list(maxResults=100).execute()
+        items = results.get('items')
+
+        for item in items:
+            if item['title'] == title:
+                return item['id']
+    except HttpError as err:
+        print(err)
+
+
 def get_all_tasklists(creds, num_lists, verbose=False):
     """
     Print out all task lists.
@@ -28,19 +45,23 @@ def get_all_tasklists(creds, num_lists, verbose=False):
             print(err._get_reason())
 
 
-def get_tasklist(creds, task_list, verbose=False):
+def get_tasklist(creds, title, verbose=False):
     """
     Print out specific task list.
     """
 
     try:
         service = build('tasks', 'v1', credentials=creds)
-        results = service.tasklists().get(tasklist=task_list).execute()
-        task_title = results.get('title')
-        task_updated = results.get('updated')
+        tasklist_id = get_tasklist_id(creds, title)
+        if not tasklist_id:
+            print('Task list does not exist')
+            return
+        results = service.tasklists().get(tasklist=tasklist_id).execute()
+        tasklist_id = results.get('id')
+        tasklist_updated = results.get('updated')
 
-        print('Title: {0}'.format(task_title))
-        print('Updated: {0}'.format(task_updated))
+        print('ID: {0}'.format(tasklist_id))
+        print('Updated: {0}'.format(tasklist_updated))
     except HttpError as err:
         if verbose:
             print(err)
@@ -56,11 +77,7 @@ def create_tasklist(creds, title, verbose=False):
     try:
         service = build('tasks', 'v1', credentials=creds)
         tasklist = {"title": title}
-        results = service.tasklists().insert(body=tasklist).execute()
-        task_title = results.get('title')
-        task_id = results.get('id')
-
-        print('Task list created: {0} (ID: {1})'.format(task_title, task_id))
+        service.tasklists().insert(body=tasklist).execute()
     except HttpError as err:
         if verbose:
             print(err)
@@ -68,14 +85,18 @@ def create_tasklist(creds, title, verbose=False):
             print(err._get_reason())
 
 
-def delete_tasklist(creds, task_list, verbose=False):
+def delete_tasklist(creds, title, verbose=False):
     """
     Delete a task list.
     """
 
     try:
         service = build('tasks', 'v1', credentials=creds)
-        service.tasklists().delete(tasklist=task_list).execute()
+        tasklist_id = get_tasklist_id(creds, title)
+        if not tasklist_id:
+            print('Task list does not exist')
+            return
+        service.tasklists().delete(tasklist=tasklist_id).execute()
     except HttpError as err:
         if verbose:
             print(err)
