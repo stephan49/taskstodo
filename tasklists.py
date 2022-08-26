@@ -35,9 +35,10 @@ def get_all_tasklists(creds, num_lists, verbose=False):
             print('No task lists found.')
             return
 
-        print('Task lists:')
         for item in items:
-            print('  - {0} (ID: {1})'.format(item['title'], item['id']))
+            print('- {0}'.format(item['title']))
+            print('  - ID: {0}'.format(item['id']))
+            print('  - Updated: {0}'.format(item['updated']))
     except HttpError as err:
         if verbose:
             print(err)
