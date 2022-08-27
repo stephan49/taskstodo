@@ -103,3 +103,24 @@ def delete_tasklist(creds, title, verbose=False):
             print(err)
         else:
             print(err._get_reason())
+
+
+def update_tasklist(creds, title, new_title, verbose=False):
+    """
+    Update title of task list.
+    """
+
+    try:
+        service = build('tasks', 'v1', credentials=creds)
+        tasklist_id = get_tasklist_id(creds, title)
+        if not tasklist_id:
+            print('Task list does not exist')
+            return
+        new_tasklist = {"title": new_title}
+        service.tasklists().patch(tasklist=tasklist_id,
+                                  body=new_tasklist).execute()
+    except HttpError as err:
+        if verbose:
+            print(err)
+        else:
+            print(err._get_reason())

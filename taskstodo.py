@@ -29,6 +29,8 @@ parser_list.add_argument('-c', '--create', action='store_true',
                          help='create new task list')
 parser_list.add_argument('-d', '--delete', action='store_true',
                          help='delete existing task list')
+parser_list.add_argument('-u', '--update', metavar='new-title',
+                         type=str, help='update title of task list')
 parser_list.add_argument('-v', '--verbose', action='store_true',
                          help='show verbose messages')
 parser_list.add_argument('title', type=str, help='title of task list to use')
@@ -68,23 +70,19 @@ def main():
     if len(sys.argv) == 1:
         parser.print_usage()
         return
-    elif len(sys.argv) == 2 and sys.argv[1] == CMDS[1]:
-        parser_list.print_usage()
-        return
-    elif len(sys.argv) == 2 and sys.argv[1] == CMDS[2]:
-        parser_task.print_usage()
-        return
 
     if sys.argv[1] == CMDS[0]:
         tasklists.get_all_tasklists(creds, args.max_results, args.verbose)
         return
 
-    if args.title and not args.create and not args.delete:
+    if args.title and not args.create and not args.delete and not args.update:
         tasklists.get_tasklist(creds, args.title, args.verbose)
     if args.create:
         tasklists.create_tasklist(creds, args.title, args.verbose)
     if args.delete:
         tasklists.delete_tasklist(creds, args.title, args.verbose)
+    if args.update:
+        tasklists.update_tasklist(creds, args.title, args.update, args.verbose)
 
 
 if __name__ == '__main__':
