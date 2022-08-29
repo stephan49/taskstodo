@@ -1,24 +1,56 @@
 #!/usr/bin/env python3
 
+import pickle
+
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 
-def get_tasklist_id(creds, title):
+def create_tasklist_cache(creds):
     """
-    Get task list ID from title
+    Get task list IDs and titles from server and dump results to cache file.
+
+    Return dictionary of task list IDs and titles.
     """
 
     try:
         service = build('tasks', 'v1', credentials=creds)
         results = service.tasklists().list(maxResults=100).execute()
         items = results.get('items')
-
+        tasklists_id_title = {}
         for item in items:
-            if item['title'] == title:
-                return item['id']
+            tasklists_id_title[item['id']] = item['title']
+
+        with open('tasklists.dat', 'wb') as f:
+            pickle.dump(tasklists_id_title, f)
+
+        return tasklists_id_title
     except HttpError as err:
         print(err)
+
+
+def get_tasklist_id(creds, title):
+    """
+    Get task list ID from title.
+    """
+
+    tasklists_id_title = {}
+    try:
+        # Read in any cached task lists file
+        with open('tasklists.dat', 'rb') as f:
+            tasklists_id_title = pickle.load(f)
+    except FileNotFoundError:
+        tasklists_id_title = create_tasklist_cache(creds)
+
+    for tasklist_id in tasklists_id_title:
+        if tasklists_id_title[tasklist_id] == title:
+            return tasklist_id
+
+    # Refresh cache and try again if title not found
+    tasklists_id_title = create_tasklist_cache(creds)
+    for tasklist_id in tasklists_id_title:
+        if tasklists_id_title[tasklist_id] == title:
+            return tasklist_id
 
 
 def get_all_tasklists(creds, num_lists, verbose=False):
