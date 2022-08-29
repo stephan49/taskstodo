@@ -29,17 +29,30 @@ def create_tasklist_cache(creds):
         print(err)
 
 
+def load_tasklist_cache():
+    """
+    Load task list IDs and titles from cache file.
+
+    Return dictionary of task list IDs and titles.
+    """
+
+    tasklists_id_title = {}
+    try:
+        with open('tasklists.dat', 'rb') as f:
+            tasklists_id_title = pickle.load(f)
+
+        return tasklists_id_title
+    except FileNotFoundError:
+        pass
+
+
 def get_tasklist_id(creds, title):
     """
     Get task list ID from title.
     """
 
-    tasklists_id_title = {}
-    try:
-        # Read in any cached task lists file
-        with open('tasklists.dat', 'rb') as f:
-            tasklists_id_title = pickle.load(f)
-    except FileNotFoundError:
+    tasklists_id_title = load_tasklist_cache()
+    if not tasklists_id_title:
         tasklists_id_title = create_tasklist_cache(creds)
 
     for tasklist_id in tasklists_id_title:
@@ -111,7 +124,15 @@ def create_tasklist(creds, title, verbose=False):
     try:
         service = build('tasks', 'v1', credentials=creds)
         tasklist = {"title": title}
-        service.tasklists().insert(body=tasklist).execute()
+        results = service.tasklists().insert(body=tasklist).execute()
+        tasklist_id = results.get('id')
+
+        # Update cache file
+        tasklists_id_title = load_tasklist_cache()
+        if tasklists_id_title is not None:
+            tasklists_id_title[tasklist_id] = title
+            with open('tasklists.dat', 'wb') as f:
+                pickle.dump(tasklists_id_title, f)
     except HttpError as err:
         if verbose:
             print(err)
@@ -131,6 +152,12 @@ def delete_tasklist(creds, title, verbose=False):
             print('Task list does not exist')
             return
         service.tasklists().delete(tasklist=tasklist_id).execute()
+
+        # Update cache file
+        tasklists_id_title = load_tasklist_cache()
+        tasklists_id_title.pop(tasklist_id)
+        with open('tasklists.dat', 'wb') as f:
+            pickle.dump(tasklists_id_title, f)
     except HttpError as err:
         if verbose:
             print(err)
@@ -152,6 +179,12 @@ def update_tasklist(creds, title, new_title, verbose=False):
         new_tasklist = {"title": new_title}
         service.tasklists().patch(tasklist=tasklist_id,
                                   body=new_tasklist).execute()
+
+        # Update cache file
+        tasklists_id_title = load_tasklist_cache()
+        tasklists_id_title[tasklist_id] = new_title
+        with open('tasklists.dat', 'wb') as f:
+            pickle.dump(tasklists_id_title, f)
     except HttpError as err:
         if verbose:
             print(err)
