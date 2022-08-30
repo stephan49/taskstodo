@@ -25,12 +25,13 @@ parser_show_lists.add_argument('-v', '--verbose', action='store_true',
                                help='show verbose messages')
 
 parser_list = subparsers.add_parser(CMDS[1], help='manage a task list')
-parser_list.add_argument('-c', '--create', action='store_true',
-                         help='create new task list')
-parser_list.add_argument('-d', '--delete', action='store_true',
-                         help='delete existing task list')
-parser_list.add_argument('-u', '--update', metavar='new-title',
-                         type=str, help='update title of task list')
+group_list = parser_list.add_mutually_exclusive_group()
+group_list.add_argument('-c', '--create', action='store_true',
+                        help='create new task list')
+group_list.add_argument('-d', '--delete', action='store_true',
+                        help='delete existing task list')
+group_list.add_argument('-u', '--update', metavar='new-title',
+                        type=str, help='update title of task list')
 parser_list.add_argument('-v', '--verbose', action='store_true',
                          help='show verbose messages')
 parser_list.add_argument('title', type=str, help='title of task list to use')
@@ -77,12 +78,16 @@ def main():
 
     if args.title and not args.create and not args.delete and not args.update:
         tasklists.get_tasklist(creds, args.title, args.verbose)
+        return
     if args.create:
         tasklists.create_tasklist(creds, args.title, args.verbose)
+        return
     if args.delete:
         tasklists.delete_tasklist(creds, args.title, args.verbose)
+        return
     if args.update:
         tasklists.update_tasklist(creds, args.title, args.update, args.verbose)
+        return
 
 
 if __name__ == '__main__':
