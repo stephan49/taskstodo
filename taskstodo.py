@@ -32,6 +32,8 @@ group_list.add_argument('-d', '--delete', action='store_true',
                         help='delete existing task list')
 group_list.add_argument('-u', '--update', metavar='new-title',
                         type=str, help='update title of task list')
+parser_list.add_argument('-s', '--select', metavar='number', default=-1,
+                         type=int, help='select a task list')
 parser_list.add_argument('-v', '--verbose', action='store_true',
                          help='show verbose messages')
 parser_list.add_argument('title', type=str, help='title of task list to use')
@@ -77,16 +79,17 @@ def main():
         return
 
     if args.title and not args.create and not args.delete and not args.update:
-        tasklists.get_tasklist(creds, args.title, args.verbose)
+        tasklists.get_tasklist(creds, args.title, args.select, args.verbose)
         return
     if args.create:
         tasklists.create_tasklist(creds, args.title, args.verbose)
         return
     if args.delete:
-        tasklists.delete_tasklist(creds, args.title, args.verbose)
+        tasklists.delete_tasklist(creds, args.title, args.select, args.verbose)
         return
     if args.update:
-        tasklists.update_tasklist(creds, args.title, args.update, args.verbose)
+        tasklists.update_tasklist(creds, args.title, args.update, args.select,
+                                  args.verbose)
         return
 
 
