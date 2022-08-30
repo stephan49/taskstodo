@@ -5,6 +5,8 @@ import pickle
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+CACHE_FILE = 'tasklists.dat'
+
 
 def create_tasklist_cache(creds):
     """
@@ -21,7 +23,7 @@ def create_tasklist_cache(creds):
         for item in items:
             tasklists_id_title[item['id']] = item['title']
 
-        with open('tasklists.dat', 'wb') as f:
+        with open(CACHE_FILE, 'wb') as f:
             pickle.dump(tasklists_id_title, f)
 
         return tasklists_id_title
@@ -38,7 +40,7 @@ def load_tasklist_cache():
 
     tasklists_id_title = {}
     try:
-        with open('tasklists.dat', 'rb') as f:
+        with open(CACHE_FILE, 'rb') as f:
             tasklists_id_title = pickle.load(f)
 
         return tasklists_id_title
@@ -131,7 +133,7 @@ def create_tasklist(creds, title, verbose=False):
         tasklists_id_title = load_tasklist_cache()
         if tasklists_id_title is not None:
             tasklists_id_title[tasklist_id] = title
-            with open('tasklists.dat', 'wb') as f:
+            with open(CACHE_FILE, 'wb') as f:
                 pickle.dump(tasklists_id_title, f)
     except HttpError as err:
         if verbose:
@@ -156,7 +158,7 @@ def delete_tasklist(creds, title, verbose=False):
         # Update cache file
         tasklists_id_title = load_tasklist_cache()
         tasklists_id_title.pop(tasklist_id)
-        with open('tasklists.dat', 'wb') as f:
+        with open(CACHE_FILE, 'wb') as f:
             pickle.dump(tasklists_id_title, f)
     except HttpError as err:
         if verbose:
@@ -183,7 +185,7 @@ def update_tasklist(creds, title, new_title, verbose=False):
         # Update cache file
         tasklists_id_title = load_tasklist_cache()
         tasklists_id_title[tasklist_id] = new_title
-        with open('tasklists.dat', 'wb') as f:
+        with open(CACHE_FILE, 'wb') as f:
             pickle.dump(tasklists_id_title, f)
     except HttpError as err:
         if verbose:
