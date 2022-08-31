@@ -15,20 +15,22 @@ def create_tasklist_cache(creds):
     Return dictionary of task list IDs and titles.
     """
 
+    service = build('tasks', 'v1', credentials=creds)
     try:
-        service = build('tasks', 'v1', credentials=creds)
         results = service.tasklists().list(maxResults=100).execute()
-        items = results.get('items')
-        tasklists_id_title = {}
-        for item in items:
-            tasklists_id_title[item['id']] = item['title']
-
-        with open(CACHE_FILE, 'wb') as f:
-            pickle.dump(tasklists_id_title, f)
-
-        return tasklists_id_title
     except HttpError as err:
         print(err)
+        return
+
+    items = results.get('items')
+    tasklists_id_title = {}
+    for item in items:
+        tasklists_id_title[item['id']] = item['title']
+
+    with open(CACHE_FILE, 'wb') as f:
+        pickle.dump(tasklists_id_title, f)
+
+    return tasklists_id_title
 
 
 def load_tasklist_cache():
@@ -90,25 +92,27 @@ def get_all_tasklists(creds, num_lists, verbose):
     Print out all task lists.
     """
 
+    service = build('tasks', 'v1', credentials=creds)
     try:
-        service = build('tasks', 'v1', credentials=creds)
+        # Get all task lists
         results = service.tasklists().list(maxResults=num_lists).execute()
-        items = results.get('items')
-
-        if not items:
-            print('No task lists found.')
-            return
-
-        for item in items:
-            print('- {0}'.format(item['title']))
-            if verbose:
-                print('  - ID: {0}'.format(item['id']))
-                print('  - Updated: {0}'.format(item['updated']))
     except HttpError as err:
         if verbose:
             print(err)
         else:
             print(err._get_reason())
+        return
+
+    items = results.get('items')
+    if not items:
+        print('No task lists found.')
+        return
+
+    for item in items:
+        print('- {0}'.format(item['title']))
+        if verbose:
+            print('  - ID: {0}'.format(item['id']))
+            print('  - Updated: {0}'.format(item['updated']))
 
 
 def get_tasklist(creds, title, select, verbose):
@@ -116,29 +120,31 @@ def get_tasklist(creds, title, select, verbose):
     Print out specific task list.
     """
 
-    try:
-        service = build('tasks', 'v1', credentials=creds)
-        tasklist_ids = get_tasklist_ids(creds, title)
-        if not tasklist_ids:
-            print('Task list does not exist')
-        elif len(tasklist_ids) > 1 and select == -1:
-            # Show duplicate titled lists when no selection made
-            print_duplicates(tasklist_ids)
-        else:
-            if len(tasklist_ids) == 1 or select == -1:
-                select = 0
+    service = build('tasks', 'v1', credentials=creds)
+    tasklist_ids = get_tasklist_ids(creds, title)
+    if not tasklist_ids:
+        print('Task list does not exist')
+    elif len(tasklist_ids) > 1 and select == -1:
+        # Show duplicate titled lists when no selection made
+        print_duplicates(tasklist_ids)
+    else:
+        if len(tasklist_ids) == 1 or select == -1:
+            select = 0
+        try:
+            # Get task list
             results = service.tasklists().get(
                     tasklist=tasklist_ids[select]).execute()
-            tasklist_ids = results.get('id')
-            tasklist_updated = results.get('updated')
+        except HttpError as err:
+            if verbose:
+                print(err)
+            else:
+                print(err._get_reason())
+            return
 
-            print('ID: {0}'.format(tasklist_ids))
-            print('Updated: {0}'.format(tasklist_updated))
-    except HttpError as err:
-        if verbose:
-            print(err)
-        else:
-            print(err._get_reason())
+        tasklist_ids = results.get('id')
+        tasklist_updated = results.get('updated')
+        print('ID: {0}'.format(tasklist_ids))
+        print('Updated: {0}'.format(tasklist_updated))
 
 
 def create_tasklist(creds, title, verbose):
@@ -146,23 +152,25 @@ def create_tasklist(creds, title, verbose):
     Create a new task list.
     """
 
+    service = build('tasks', 'v1', credentials=creds)
+    tasklist = {"title": title}
     try:
-        service = build('tasks', 'v1', credentials=creds)
-        tasklist = {"title": title}
+        # Create task list
         results = service.tasklists().insert(body=tasklist).execute()
-        tasklist_id = results.get('id')
-
-        # Update cache file
-        tasklists_id_title = load_tasklist_cache()
-        if tasklists_id_title is not None:
-            tasklists_id_title[tasklist_id] = title
-            with open(CACHE_FILE, 'wb') as f:
-                pickle.dump(tasklists_id_title, f)
     except HttpError as err:
         if verbose:
             print(err)
         else:
             print(err._get_reason())
+        return
+    tasklist_id = results.get('id')
+
+    # Update cache file
+    tasklists_id_title = load_tasklist_cache()
+    if tasklists_id_title is not None:
+        tasklists_id_title[tasklist_id] = title
+        with open(CACHE_FILE, 'wb') as f:
+            pickle.dump(tasklists_id_title, f)
 
 
 def delete_tasklist(creds, title, select, verbose):
@@ -170,29 +178,31 @@ def delete_tasklist(creds, title, select, verbose):
     Delete a task list.
     """
 
-    try:
-        service = build('tasks', 'v1', credentials=creds)
-        tasklist_ids = get_tasklist_ids(creds, title)
-        if not tasklist_ids:
-            print('Task list does not exist')
-        elif len(tasklist_ids) > 1 and select == -1:
-            # Show duplicate titled lists when no selection made
-            print_duplicates(tasklist_ids)
-        else:
-            if len(tasklist_ids) == 1 or select == -1:
-                select = 0
+    service = build('tasks', 'v1', credentials=creds)
+    tasklist_ids = get_tasklist_ids(creds, title)
+    if not tasklist_ids:
+        print('Task list does not exist')
+    elif len(tasklist_ids) > 1 and select == -1:
+        # Show duplicate titled lists when no selection made
+        print_duplicates(tasklist_ids)
+    else:
+        if len(tasklist_ids) == 1 or select == -1:
+            select = 0
+        try:
+            # Delete task list
             service.tasklists().delete(tasklist=tasklist_ids[select]).execute()
+        except HttpError as err:
+            if verbose:
+                print(err)
+            else:
+                print(err._get_reason())
+            return
 
-            # Update cache file
-            tasklists_id_title = load_tasklist_cache()
-            tasklists_id_title.pop(tasklist_ids[select])
-            with open(CACHE_FILE, 'wb') as f:
-                pickle.dump(tasklists_id_title, f)
-    except HttpError as err:
-        if verbose:
-            print(err)
-        else:
-            print(err._get_reason())
+        # Update cache file
+        tasklists_id_title = load_tasklist_cache()
+        tasklists_id_title.pop(tasklist_ids[select])
+        with open(CACHE_FILE, 'wb') as f:
+            pickle.dump(tasklists_id_title, f)
 
 
 def update_tasklist(creds, title, new_title, select, verbose):
@@ -200,28 +210,30 @@ def update_tasklist(creds, title, new_title, select, verbose):
     Update title of task list.
     """
 
-    try:
-        service = build('tasks', 'v1', credentials=creds)
-        tasklist_ids = get_tasklist_ids(creds, title)
-        if not tasklist_ids:
-            print('Task list does not exist')
-        elif len(tasklist_ids) > 1 and select == -1:
-            # Show duplicate titled lists when no selection made
-            print_duplicates(tasklist_ids)
-        else:
-            if len(tasklist_ids) == 1 or select == -1:
-                select = 0
-            new_tasklist = {"title": new_title}
+    service = build('tasks', 'v1', credentials=creds)
+    tasklist_ids = get_tasklist_ids(creds, title)
+    if not tasklist_ids:
+        print('Task list does not exist')
+    elif len(tasklist_ids) > 1 and select == -1:
+        # Show duplicate titled lists when no selection made
+        print_duplicates(tasklist_ids)
+    else:
+        if len(tasklist_ids) == 1 or select == -1:
+            select = 0
+        new_tasklist = {"title": new_title}
+        try:
+            # Update task list
             service.tasklists().patch(tasklist=tasklist_ids[select],
                                       body=new_tasklist).execute()
+        except HttpError as err:
+            if verbose:
+                print(err)
+            else:
+                print(err._get_reason())
+            return
 
-            # Update cache file
-            tasklists_id_title = load_tasklist_cache()
-            tasklists_id_title[tasklist_ids[select]] = new_title
-            with open(CACHE_FILE, 'wb') as f:
-                pickle.dump(tasklists_id_title, f)
-    except HttpError as err:
-        if verbose:
-            print(err)
-        else:
-            print(err._get_reason())
+        # Update cache file
+        tasklists_id_title = load_tasklist_cache()
+        tasklists_id_title[tasklist_ids[select]] = new_title
+        with open(CACHE_FILE, 'wb') as f:
+            pickle.dump(tasklists_id_title, f)
