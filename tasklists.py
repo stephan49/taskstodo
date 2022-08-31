@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-import pickle
+import json
 
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-CACHE_FILE = 'tasklists.dat'
+CACHE_FILE = 'tasklists.json'
 
 
 def create_tasklist_cache(creds):
@@ -27,8 +27,8 @@ def create_tasklist_cache(creds):
     for item in items:
         tasklists_id_title[item['id']] = item['title']
 
-    with open(CACHE_FILE, 'wb') as f:
-        pickle.dump(tasklists_id_title, f)
+    with open(CACHE_FILE, 'w') as f:
+        json.dump(tasklists_id_title, f)
 
     return tasklists_id_title
 
@@ -42,8 +42,8 @@ def load_tasklist_cache():
 
     tasklists_id_title = {}
     try:
-        with open(CACHE_FILE, 'rb') as f:
-            tasklists_id_title = pickle.load(f)
+        with open(CACHE_FILE, 'r') as f:
+            tasklists_id_title = json.load(f)
 
         return tasklists_id_title
     except FileNotFoundError:
@@ -169,8 +169,8 @@ def create_tasklist(creds, title, verbose):
     tasklists_id_title = load_tasklist_cache()
     if tasklists_id_title is not None:
         tasklists_id_title[tasklist_id] = title
-        with open(CACHE_FILE, 'wb') as f:
-            pickle.dump(tasklists_id_title, f)
+        with open(CACHE_FILE, 'w') as f:
+            json.dump(tasklists_id_title, f)
 
 
 def delete_tasklist(creds, title, select, verbose):
@@ -201,8 +201,8 @@ def delete_tasklist(creds, title, select, verbose):
         # Update cache file
         tasklists_id_title = load_tasklist_cache()
         tasklists_id_title.pop(tasklist_ids[select])
-        with open(CACHE_FILE, 'wb') as f:
-            pickle.dump(tasklists_id_title, f)
+        with open(CACHE_FILE, 'w') as f:
+            json.dump(tasklists_id_title, f)
 
 
 def update_tasklist(creds, title, new_title, select, verbose):
@@ -235,5 +235,5 @@ def update_tasklist(creds, title, new_title, select, verbose):
         # Update cache file
         tasklists_id_title = load_tasklist_cache()
         tasklists_id_title[tasklist_ids[select]] = new_title
-        with open(CACHE_FILE, 'wb') as f:
-            pickle.dump(tasklists_id_title, f)
+        with open(CACHE_FILE, 'w') as f:
+            json.dump(tasklists_id_title, f)
