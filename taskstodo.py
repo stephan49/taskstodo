@@ -20,7 +20,7 @@ parser_show_lists = subparsers.add_parser(CMDS[0], help='show all task lists')
 parser_show_lists.add_argument('-m', '--max-results', metavar='number',
                                default=10, type=int,
                                help='''max number of lists to return
-                             (default: %(default)s)''')
+                               (default: %(default)s)''')
 parser_show_lists.add_argument('-v', '--verbose', action='store_true',
                                help='show verbose messages')
 
@@ -78,18 +78,18 @@ def main():
         tasklists.get_all_tasklists(creds, args.max_results, args.verbose)
         return
 
-    if args.title and not args.create and not args.delete and not args.update:
-        tasklists.get_tasklist(creds, args.title, args.select, args.verbose)
-        return
-    if args.create:
-        tasklists.create_tasklist(creds, args.title, args.verbose)
-        return
-    if args.delete:
-        tasklists.delete_tasklist(creds, args.title, args.select, args.verbose)
-        return
-    if args.update:
-        tasklists.update_tasklist(creds, args.title, args.update, args.select,
-                                  args.verbose)
+    if sys.argv[1] == CMDS[1]:
+        if args.create:
+            tasklists.create_tasklist(creds, args.title, args.verbose)
+        elif args.delete:
+            tasklists.delete_tasklist(creds, args.title, args.select,
+                                      args.verbose)
+        elif args.update:
+            tasklists.update_tasklist(creds, args.title, args.update,
+                                      args.select, args.verbose)
+        else:
+            tasklists.get_tasklist(creds, args.title, args.select,
+                                   args.verbose)
         return
 
 
