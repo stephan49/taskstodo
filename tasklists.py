@@ -28,7 +28,7 @@ def create_tasklist_cache(creds):
         tasklists_id_title[item['id']] = item['title']
 
     with open(CACHE_FILE, 'w') as f:
-        json.dump(tasklists_id_title, f)
+        json.dump(tasklists_id_title, f, indent=4)
 
     return tasklists_id_title
 
