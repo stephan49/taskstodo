@@ -4,6 +4,7 @@ import sys
 import os.path
 import argparse
 import tasklists
+import tasks
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -39,6 +40,16 @@ parser_list.add_argument('-v', '--verbose', action='store_true',
 parser_list.add_argument('title', type=str, help='title of task list to use')
 
 parser_task = subparsers.add_parser(CMDS[2], help='manage tasks')
+group_task = parser_task.add_mutually_exclusive_group()
+group_task.add_argument('-c', '--create', action='store_true',
+                        help='create new task')
+parser_task.add_argument('-s', '--select', metavar='number', default=-1,
+                         type=int, help='select a task list')
+parser_task.add_argument('-v', '--verbose', action='store_true',
+                         help='show verbose messages')
+parser_task.add_argument('tasklist', type=str,
+                         help='title of task list to use')
+parser_task.add_argument('title', type=str, help='title of task')
 
 args = parser.parse_args()
 
@@ -91,6 +102,12 @@ def main():
             tasklists.get_tasklist(creds, args.title, args.select,
                                    args.verbose)
         return
+
+    if sys.argv[1] == CMDS[2]:
+        if args.create:
+            tasks.create_task(creds, args.tasklist, args.title, args.select,
+                              args.verbose)
+            return
 
 
 if __name__ == '__main__':
