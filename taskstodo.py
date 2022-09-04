@@ -31,20 +31,20 @@ group_list.add_argument('-c', '--create', action='store_true',
                         help='create new task list')
 group_list.add_argument('-d', '--delete', action='store_true',
                         help='delete existing task list')
-group_list.add_argument('-u', '--update', metavar='new-title',
-                        type=str, help='update title of task list')
-parser_list.add_argument('-s', '--select', metavar='number', default=-1,
-                         type=int, help='select a task list')
+group_list.add_argument('-u', '--update', metavar='new-title', type=str,
+                        help='update title of task list')
+parser_list.add_argument('-l', '--list', metavar='number', default=-1,
+                         type=int, help='select task list')
 parser_list.add_argument('-v', '--verbose', action='store_true',
                          help='show verbose messages')
 parser_list.add_argument('title', type=str, help='title of task list to use')
 
 parser_task = subparsers.add_parser(CMDS[2], help='manage tasks')
 group_task = parser_task.add_mutually_exclusive_group()
-group_task.add_argument('-c', '--create', action='store_true',
+group_task.add_argument('-c', '--create', metavar='task', type=str,
                         help='create new task')
-parser_task.add_argument('-s', '--select', metavar='number', default=-1,
-                         type=int, help='select a task list')
+parser_task.add_argument('-l', '--list', metavar='number', default=-1,
+                         type=int, help='select task list')
 parser_task.add_argument('-v', '--verbose', action='store_true',
                          help='show verbose messages')
 parser_task.add_argument('tasklist', type=str,
@@ -93,19 +93,19 @@ def main():
         if args.create:
             tasklists.create_tasklist(creds, args.title, args.verbose)
         elif args.delete:
-            tasklists.delete_tasklist(creds, args.title, args.select,
+            tasklists.delete_tasklist(creds, args.title, args.list,
                                       args.verbose)
         elif args.update:
             tasklists.update_tasklist(creds, args.title, args.update,
-                                      args.select, args.verbose)
+                                      args.list, args.verbose)
         else:
-            tasklists.get_tasklist(creds, args.title, args.select,
+            tasklists.get_tasklist(creds, args.title, args.list,
                                    args.verbose)
         return
 
     if sys.argv[1] == CMDS[2]:
         if args.create:
-            tasks.create_task(creds, args.tasklist, args.title, args.select,
+            tasks.create_task(creds, args.tasklist, args.create, args.list,
                               args.verbose)
             return
 

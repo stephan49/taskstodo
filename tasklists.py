@@ -60,7 +60,7 @@ def print_duplicates(tasklist_ids):
     print('Multiple task lists with duplicate titles found:')
     for i in range(len(tasklist_ids)):
         print('{0}. ID: {1}'.format(i, tasklist_ids[i]))
-    print('\nUse -s option to select match')
+    print('\nUse -l option to select list')
 
 
 def get_tasklist_ids(creds, title):
@@ -117,7 +117,7 @@ def get_all_tasklists(creds, num_lists, verbose):
             print('  - Updated: {0}'.format(item['updated']))
 
 
-def get_tasklist(creds, title, select, verbose):
+def get_tasklist(creds, title, select_list, verbose):
     """
     Print out specific task list and its tasks.
     """
@@ -126,19 +126,19 @@ def get_tasklist(creds, title, select, verbose):
     tasklist_ids = get_tasklist_ids(creds, title)
     if not tasklist_ids:
         print('Task list does not exist')
-    elif len(tasklist_ids) > 1 and select == -1:
+    elif len(tasklist_ids) > 1 and select_list == -1:
         # Show duplicate titled lists when no selection made
         print_duplicates(tasklist_ids)
     else:
-        if len(tasklist_ids) == 1 or select == -1:
-            select = 0
+        if len(tasklist_ids) == 1 or select_list == -1:
+            select_list = 0
         try:
             # Get task list
             tasklist_results = service.tasklists().get(
-                    tasklist=tasklist_ids[select]).execute()
+                    tasklist=tasklist_ids[select_list]).execute()
             # Get tasks for task list
             task_results = service.tasks().list(
-                    tasklist=tasklist_ids[select]).execute()
+                    tasklist=tasklist_ids[select_list]).execute()
         except HttpError as err:
             if verbose:
                 print(err)
@@ -154,8 +154,8 @@ def get_tasklist(creds, title, select, verbose):
 
         print('Tasks:')
         task_items = task_results.get('items')
-        for task_item in task_items:
-            print('- {0}'.format(task_item['title']))
+        for i in range(len(task_items)):
+            print('{0}. {1}'.format(i, task_items[i]['title']))
 
 
 def create_tasklist(creds, title, verbose):
@@ -185,7 +185,7 @@ def create_tasklist(creds, title, verbose):
             json.dump(tasklists, f, indent=4)
 
 
-def delete_tasklist(creds, title, select, verbose):
+def delete_tasklist(creds, title, select_list, verbose):
     """
     Delete a task list.
     """
@@ -194,15 +194,16 @@ def delete_tasklist(creds, title, select, verbose):
     tasklist_ids = get_tasklist_ids(creds, title)
     if not tasklist_ids:
         print('Task list does not exist')
-    elif len(tasklist_ids) > 1 and select == -1:
+    elif len(tasklist_ids) > 1 and select_list == -1:
         # Show duplicate titled lists when no selection made
         print_duplicates(tasklist_ids)
     else:
-        if len(tasklist_ids) == 1 or select == -1:
-            select = 0
+        if len(tasklist_ids) == 1 or select_list == -1:
+            select_list = 0
         try:
             # Delete task list
-            service.tasklists().delete(tasklist=tasklist_ids[select]).execute()
+            service.tasklists().delete(
+                    tasklist=tasklist_ids[select_list]).execute()
         except HttpError as err:
             if verbose:
                 print(err)
@@ -213,14 +214,14 @@ def delete_tasklist(creds, title, select, verbose):
         # Update cache file
         tasklists = load_tasklist_cache()
         for tasklist in tasklists:
-            if tasklist['id'] == tasklist_ids[select]:
+            if tasklist['id'] == tasklist_ids[select_list]:
                 tasklists.remove(tasklist)
                 break
         with open(CACHE_FILE, 'w') as f:
             json.dump(tasklists, f, indent=4)
 
 
-def update_tasklist(creds, title, new_title, select, verbose):
+def update_tasklist(creds, title, new_title, select_list, verbose):
     """
     Update title of task list.
     """
@@ -229,16 +230,16 @@ def update_tasklist(creds, title, new_title, select, verbose):
     tasklist_ids = get_tasklist_ids(creds, title)
     if not tasklist_ids:
         print('Task list does not exist')
-    elif len(tasklist_ids) > 1 and select == -1:
+    elif len(tasklist_ids) > 1 and select_list == -1:
         # Show duplicate titled lists when no selection made
         print_duplicates(tasklist_ids)
     else:
-        if len(tasklist_ids) == 1 or select == -1:
-            select = 0
+        if len(tasklist_ids) == 1 or select_list == -1:
+            select_list = 0
         new_tasklist = {"title": new_title}
         try:
             # Update task list
-            service.tasklists().patch(tasklist=tasklist_ids[select],
+            service.tasklists().patch(tasklist=tasklist_ids[select_list],
                                       body=new_tasklist).execute()
         except HttpError as err:
             if verbose:
@@ -250,7 +251,7 @@ def update_tasklist(creds, title, new_title, select, verbose):
         # Update cache file
         tasklists = load_tasklist_cache()
         for tasklist in tasklists:
-            if tasklist['id'] == tasklist_ids[select]:
+            if tasklist['id'] == tasklist_ids[select_list]:
                 tasklist['title'] = new_title
                 break
         with open(CACHE_FILE, 'w') as f:
