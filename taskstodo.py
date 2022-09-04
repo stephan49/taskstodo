@@ -31,25 +31,27 @@ group_list.add_argument('-c', '--create', action='store_true',
                         help='create new task list')
 group_list.add_argument('-d', '--delete', action='store_true',
                         help='delete existing task list')
-group_list.add_argument('-u', '--update', metavar='new-title', type=str,
+group_list.add_argument('-u', '--update', metavar='title', type=str,
                         help='update title of task list')
 parser_list.add_argument('-l', '--list', metavar='number', default=-1,
-                         type=int, help='select task list')
+                         type=int, dest='list_num', help='select task list')
 parser_list.add_argument('-v', '--verbose', action='store_true',
                          help='show verbose messages')
-parser_list.add_argument('title', type=str, help='title of task list to use')
+parser_list.add_argument('list_title', type=str,
+                         help='title of task list to use')
 
 parser_task = subparsers.add_parser(CMDS[2], help='manage tasks')
 group_task = parser_task.add_mutually_exclusive_group()
 group_task.add_argument('-c', '--create', metavar='task', type=str,
                         help='create new task')
+parser_task.add_argument('-t', '--task', metavar='number', default=-1,
+                         dest='task_num', type=int, help='select task')
 parser_task.add_argument('-l', '--list', metavar='number', default=-1,
-                         type=int, help='select task list')
+                         dest='list_num', type=int, help='select task list')
 parser_task.add_argument('-v', '--verbose', action='store_true',
                          help='show verbose messages')
-parser_task.add_argument('tasklist', type=str,
+parser_task.add_argument('list_title', type=str,
                          help='title of task list to use')
-parser_task.add_argument('title', type=str, help='title of task')
 
 args = parser.parse_args()
 
@@ -91,23 +93,26 @@ def main():
 
     if sys.argv[1] == CMDS[1]:
         if args.create:
-            tasklists.create_tasklist(creds, args.title, args.verbose)
+            tasklists.create_tasklist(creds, args.list_title, args.verbose)
         elif args.delete:
-            tasklists.delete_tasklist(creds, args.title, args.list,
+            tasklists.delete_tasklist(creds, args.list_title, args.list_num,
                                       args.verbose)
         elif args.update:
-            tasklists.update_tasklist(creds, args.title, args.update,
-                                      args.list, args.verbose)
+            tasklists.update_tasklist(creds, args.list_title, args.update,
+                                      args.list_num, args.verbose)
         else:
-            tasklists.get_tasklist(creds, args.title, args.list,
+            tasklists.get_tasklist(creds, args.list_title, args.list_num,
                                    args.verbose)
         return
 
     if sys.argv[1] == CMDS[2]:
         if args.create:
-            tasks.create_task(creds, args.tasklist, args.create, args.list,
-                              args.verbose)
-            return
+            tasks.create_task(creds, args.list_title, args.create,
+                              args.list_num, args.verbose)
+        else:
+            tasks.get_task(creds, args.list_title, args.task_num,
+                           args.list_num, args.verbose)
+        return
 
 
 if __name__ == '__main__':
