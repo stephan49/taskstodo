@@ -10,7 +10,7 @@ CACHE_FILE = 'tasklists.json'
 
 def create_tasklist_cache(creds):
     """
-    Get task list IDs and titles from server and dump results to cache file.
+    Get task list details from server and dump results to cache file.
 
     Return list of dictionaries of task lists.
     """
@@ -119,7 +119,7 @@ def get_all_tasklists(creds, num_lists, verbose):
 
 def get_tasklist(creds, title, select, verbose):
     """
-    Print out specific task list.
+    Print out specific task list and its tasks.
     """
 
     service = build('tasks', 'v1', credentials=creds)
@@ -134,7 +134,10 @@ def get_tasklist(creds, title, select, verbose):
             select = 0
         try:
             # Get task list
-            results = service.tasklists().get(
+            tasklist_results = service.tasklists().get(
+                    tasklist=tasklist_ids[select]).execute()
+            # Get tasks for task list
+            task_results = service.tasks().list(
                     tasklist=tasklist_ids[select]).execute()
         except HttpError as err:
             if verbose:
@@ -143,10 +146,16 @@ def get_tasklist(creds, title, select, verbose):
                 print(err._get_reason())
             return
 
-        tasklist_ids = results.get('id')
-        tasklist_updated = results.get('updated')
-        print('ID: {0}'.format(tasklist_ids))
-        print('Updated: {0}'.format(tasklist_updated))
+        if verbose:
+            tasklist_ids = tasklist_results.get('id')
+            tasklist_updated = tasklist_results.get('updated')
+            print('ID: {0}'.format(tasklist_ids))
+            print('Updated: {0}'.format(tasklist_updated))
+
+        print('Tasks:')
+        task_items = task_results.get('items')
+        for task_item in task_items:
+            print('- {0}'.format(task_item['title']))
 
 
 def create_tasklist(creds, title, verbose):
