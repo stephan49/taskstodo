@@ -113,3 +113,32 @@ def delete_task(creds, list_title, task_num, list_num, verbose):
             else:
                 print(err._get_reason())
             return
+
+
+def update_task(creds, list_title, task_title, task_num, list_num, verbose):
+    """
+    Update task title from specified task list.
+    """
+
+    service = build('tasks', 'v1', credentials=creds)
+    tasklist_ids = tasklists.get_tasklist_ids(creds, list_title)
+    if not tasklist_ids:
+        print('Task list does not exist')
+    elif len(tasklist_ids) > 1 and list_num == -1:
+        # Show duplicate titled lists when no selection made
+        tasklists.get_duplicates(tasklist_ids)
+    else:
+        if len(tasklist_ids) == 1 or list_num == -1:
+            list_num = 0
+        task_id = get_task_id(creds, tasklist_ids[list_num], task_num)
+        new_task = {'title': task_title}
+        try:
+            # Update task
+            service.tasks().patch(tasklist=tasklist_ids[list_num],
+                                  task=task_id, body=new_task).execute()
+        except HttpError as err:
+            if verbose:
+                print(err)
+            else:
+                print(err._get_reason())
+            return

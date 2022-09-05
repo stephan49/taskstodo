@@ -42,10 +42,12 @@ parser_list.add_argument('list_title', type=str,
 
 parser_task = subparsers.add_parser(CMDS[2], help='manage tasks')
 group_task = parser_task.add_mutually_exclusive_group()
-group_task.add_argument('-c', '--create', metavar='task', type=str,
+group_task.add_argument('-c', '--create', metavar='title', type=str,
                         help='create new task')
 group_task.add_argument('-d', '--delete', action='store_true',
                         help='delete existing task')
+group_task.add_argument('-u', '--update', metavar='title', type=str,
+                        help='update title of task')
 parser_task.add_argument('-t', '--task', metavar='number', default=-1,
                          dest='task_num', type=int, help='select task')
 parser_task.add_argument('-l', '--list', metavar='number', default=-1,
@@ -114,6 +116,9 @@ def main():
         elif args.delete:
             tasks.delete_task(creds, args.list_title, args.task_num,
                               args.list_num, args.verbose)
+        elif args.update:
+            tasks.update_task(creds, args.list_title, args.update,
+                              args.task_num, args.list_num, args.verbose)
         else:
             tasks.get_task(creds, args.list_title, args.task_num,
                            args.list_num, args.verbose)
