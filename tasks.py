@@ -65,19 +65,19 @@ def create_task(creds, list_title, task_title, list_num, verbose):
     """
 
     service = build('tasks', 'v1', credentials=creds)
-    tasklist_ids = tasklists.get_tasklist_ids(creds, tasklist_title)
+    tasklist_ids = tasklists.get_tasklist_ids(creds, list_title)
     if not tasklist_ids:
         print('Task list does not exist')
-    elif len(tasklist_ids) > 1 and select == -1:
+    elif len(tasklist_ids) > 1 and list_num == -1:
         # Show duplicate titled lists when no selection made
-        tasklists.print_duplicates(tasklist_ids)
+        tasklists.get_duplicates(tasklist_ids)
     else:
         task = {'title': task_title}
-        if len(tasklist_ids) == 1 or select == -1:
-            select = 0
+        if len(tasklist_ids) == 1 or list_num == -1:
+            list_num = 0
         try:
             # Create task
-            service.tasks().insert(tasklist=tasklist_ids[select],
+            service.tasks().insert(tasklist=tasklist_ids[list_num],
                                    body=task).execute()
         except HttpError as err:
             if verbose:
