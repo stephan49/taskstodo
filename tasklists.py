@@ -156,7 +156,11 @@ def get_tasklist(creds, title, list_num, verbose):
         print('Tasks:')
         task_items = task_results.get('items')
         for i in range(len(task_items)):
-            print('{0}. {1}'.format(i, task_items[i]['title']))
+            if verbose:
+                print('{0}. {1} (ID: {2})'.format(i, task_items[i]['title'],
+                                                  task_items[i]['id']))
+            else:
+                print('{0}. {1}'.format(i, task_items[i]['title']))
         # TODO: cache results to file
 
 
