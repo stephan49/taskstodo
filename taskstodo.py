@@ -119,9 +119,12 @@ def main():
         elif args.update:
             tasks.update_task(creds, args.list_title, args.update,
                               args.task_num, args.list_num, args.verbose)
-        else:
+        elif args.task_num != -1:
             tasks.get_task(creds, args.list_title, args.task_num,
                            args.list_num, args.verbose)
+        else:
+            tasklists.get_tasklist(creds, args.list_title, args.list_num,
+                                   args.verbose)
         return
 
 
