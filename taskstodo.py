@@ -48,6 +48,8 @@ group_task.add_argument('-d', '--delete', action='store_true',
                         help='delete existing task')
 group_task.add_argument('-u', '--update', metavar='title', type=str,
                         help='update title of task')
+group_task.add_argument('-n', '--note', metavar='note', type=str,
+                        help='create note for task')
 parser_task.add_argument('-t', '--task', metavar='number', default=-1,
                          dest='task_num', type=int, help='select task')
 parser_task.add_argument('-l', '--list', metavar='number', default=-1,
@@ -118,6 +120,9 @@ def main():
                               args.list_num, args.verbose)
         elif args.update:
             tasks.update_task(creds, args.list_title, args.update,
+                              args.task_num, args.list_num, args.verbose)
+        elif args.note:
+            tasks.create_note(creds, args.list_title, args.note,
                               args.task_num, args.list_num, args.verbose)
         elif args.task_num != -1:
             tasks.get_task(creds, args.list_title, args.task_num,
