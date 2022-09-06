@@ -155,6 +155,8 @@ def get_tasklist(creds, title, list_num, verbose):
 
         print('Tasks:')
         task_items = task_results.get('items')
+        # Sort task items by position key instead of update time
+        task_items.sort(key=lambda task_items: task_items['position'])
         for i in range(len(task_items)):
             if verbose:
                 print('{0}. {1} (ID: {2})'.format(i, task_items[i]['title'],

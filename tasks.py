@@ -19,6 +19,8 @@ def get_task_id(creds, list_id, task_num):
         print(err)
 
     items = results.get('items')
+    # Sort task items by position key instead of update time
+    items.sort(key=lambda items: items['position'])
     return items[task_num]['id']
 
 
