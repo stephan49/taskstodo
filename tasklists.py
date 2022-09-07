@@ -17,17 +17,38 @@ def create_tasklist_cache(creds):
 
     service = build('tasks', 'v1', credentials=creds)
     try:
-        results = service.tasklists().list(maxResults=100).execute()
+        # Get task lists
+        tasklist_results = service.tasklists().list(maxResults=100).execute()
     except HttpError as err:
         print(err)
         return
 
-    items = results.get('items')
+    tasklist_items = tasklist_results.get('items')
     tasklists = []
-    for i in range(len(items)):
-        tasklists.append({"id": items[i]['id']})
-        tasklists[i]["title"] = items[i]['title']
-        tasklists[i]["updated"] = items[i]['updated']
+    for i in range(len(tasklist_items)):
+        tasklists.append({'id': tasklist_items[i]['id']})
+        tasklists[i]['title'] = tasklist_items[i]['title']
+        tasklists[i]['updated'] = tasklist_items[i]['updated']
+
+        try:
+            # Get tasks
+            task_results = service.tasks().list(
+                    tasklist=tasklist_items[i]['id']).execute()
+        except HttpError as err:
+            print(err)
+            return
+
+        tasks = []
+        task_items = task_results.get('items')
+        # Sort task items by position key instead of update time
+        task_items.sort(key=lambda task_items: task_items['position'])
+        for j in range(len(task_items)):
+            tasks.append({'id': task_items[j]['id']})
+            tasks[j]['title'] = task_items[j]['title']
+            tasks[j]['updated'] = task_items[j]['updated']
+            tasks[j]['note'] = task_items[j].get('notes')
+            tasks[j]['position'] = task_items[j]['position']
+        tasklists[i]['tasks'] = tasks
 
     with open(CACHE_FILE, 'w') as f:
         json.dump(tasklists, f, indent=4)
@@ -163,7 +184,6 @@ def get_tasklist(creds, title, list_num, verbose):
                                                   task_items[i]['id']))
             else:
                 print('{0}. {1}'.format(i, task_items[i]['title']))
-        # TODO: cache results to file
 
 
 def create_tasklist(creds, title, verbose):
