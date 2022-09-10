@@ -47,7 +47,7 @@ def create_tasklist_cache(creds):
             tasks[j]['title'] = task_items[j]['title']
             tasks[j]['updated'] = task_items[j]['updated']
             tasks[j]['note'] = task_items[j].get('notes')
-            tasks[j]['position'] = task_items[j]['position']
+            tasks[j]['position'] = int(task_items[j]['position'])
         tasklists[i]['tasks'] = tasks
 
     with open(CACHE_FILE, 'w') as f:
@@ -195,22 +195,16 @@ def create_tasklist(creds, title, verbose):
     tasklist = {"title": title}
     try:
         # Create task list
-        results = service.tasklists().insert(body=tasklist).execute()
+        service.tasklists().insert(body=tasklist).execute()
     except HttpError as err:
         if verbose:
             print(err)
         else:
             print(err._get_reason())
         return
-    new_tasklist = {'id': results.get('id'), 'title': title,
-                    'updated': results.get('updated')}
 
     # Update cache file
-    tasklists = load_tasklist_cache()
-    if tasklists is not None:
-        tasklists.append(new_tasklist)
-        with open(CACHE_FILE, 'w') as f:
-            json.dump(tasklists, f, indent=4)
+    create_tasklist_cache(creds)
 
 
 def delete_tasklist(creds, title, list_num, verbose):
@@ -240,13 +234,7 @@ def delete_tasklist(creds, title, list_num, verbose):
             return
 
         # Update cache file
-        tasklists = load_tasklist_cache()
-        for tasklist in tasklists:
-            if tasklist['id'] == tasklist_ids[list_num]:
-                tasklists.remove(tasklist)
-                break
-        with open(CACHE_FILE, 'w') as f:
-            json.dump(tasklists, f, indent=4)
+        create_tasklist_cache(creds)
 
 
 def update_tasklist(creds, title, new_title, list_num, verbose):
@@ -277,10 +265,4 @@ def update_tasklist(creds, title, new_title, list_num, verbose):
             return
 
         # Update cache file
-        tasklists = load_tasklist_cache()
-        for tasklist in tasklists:
-            if tasklist['id'] == tasklist_ids[list_num]:
-                tasklist['title'] = new_title
-                break
-        with open(CACHE_FILE, 'w') as f:
-            json.dump(tasklists, f, indent=4)
+        create_tasklist_cache(creds)

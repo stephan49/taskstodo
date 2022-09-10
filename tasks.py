@@ -88,6 +88,9 @@ def create_task(creds, list_title, task_title, list_num, verbose):
                 print(err._get_reason())
             return
 
+        # Update cache file
+        tasklists.create_tasklist_cache(creds)
+
 
 def delete_task(creds, list_title, task_num, list_num, verbose):
     """
@@ -115,6 +118,9 @@ def delete_task(creds, list_title, task_num, list_num, verbose):
             else:
                 print(err._get_reason())
             return
+
+        # Update cache file
+        tasklists.create_tasklist_cache(creds)
 
 
 def update_task(creds, list_title, task_title, task_num, list_num, verbose):
@@ -145,6 +151,9 @@ def update_task(creds, list_title, task_title, task_num, list_num, verbose):
                 print(err._get_reason())
             return
 
+        # Update cache file
+        tasklists.create_tasklist_cache(creds)
+
 
 def create_note(creds, list_title, note, task_num, list_num, verbose):
     """
@@ -173,3 +182,6 @@ def create_note(creds, list_title, note, task_num, list_num, verbose):
             else:
                 print(err._get_reason())
             return
+
+        # Update cache file
+        tasklists.create_tasklist_cache(creds)
