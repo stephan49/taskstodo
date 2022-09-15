@@ -155,6 +155,45 @@ def update_task(creds, list_title, task_title, task_num, list_num, verbose):
         tasklists.create_tasklist_cache(creds)
 
 
+def move_task(creds, list_title, position, task_num, list_num, verbose):
+    """
+    Move task to new position in task list.
+    """
+
+    service = build('tasks', 'v1', credentials=creds)
+    tasklist_ids = tasklists.get_tasklist_ids(creds, list_title)
+    if not tasklist_ids:
+        print('Task list does not exist')
+    elif len(tasklist_ids) > 1 and list_num == -1:
+        # Show duplicate titled lists when no selection made
+        tasklists.get_duplicates(tasklist_ids)
+    else:
+        if len(tasklist_ids) == 1 or list_num == -1:
+            list_num = 0
+        task_id = get_task_id(creds, tasklist_ids[list_num], task_num)
+
+        if position >= 0:
+            # ID of task that will be previous to moved task
+            prev_id = get_task_id(creds, tasklist_ids[list_num], position)
+        else:
+            # Set position to top
+            prev_id = None
+
+        try:
+            # Move task
+            service.tasks().move(tasklist=tasklist_ids[list_num],
+                                 task=task_id, previous=prev_id).execute()
+        except HttpError as err:
+            if verbose:
+                print(err)
+            else:
+                print(err._get_reason())
+            return
+
+        # Update cache file
+        tasklists.create_tasklist_cache(creds)
+
+
 def create_note(creds, list_title, note, task_num, list_num, verbose):
     """
     Create note for specified task.
