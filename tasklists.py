@@ -185,6 +185,9 @@ def get_tasklist(creds, title, list_num, verbose):
             else:
                 print('{0}. {1}'.format(i, task_items[i]['title']))
 
+        # Update cache file
+        create_tasklist_cache(creds)
+
 
 def create_tasklist(creds, title, verbose):
     """

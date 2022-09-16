@@ -55,10 +55,13 @@ def get_task(creds, list_title, task_num, list_num, verbose):
             print('ID: {}'.format(task_id))
         task_title = results.get('title')
         task_updated = results.get('updated')
-        task_notes = results.get('notes')
+        task_note = results.get('notes')
         print('Title: {}'.format(task_title))
         print('Updated: {}'.format(task_updated))
-        print('Notes: {}'.format(task_notes))
+        print('Note: {}'.format(task_note))
+
+        # Update cache file
+        tasklists.create_tasklist_cache(creds)
 
 
 def create_task(creds, list_title, task_title, list_num, verbose):
