@@ -213,6 +213,9 @@ def create_note(creds, list_title, note, task_num, list_num, verbose):
         if len(tasklist_ids) == 1 or list_num == -1:
             list_num = 0
         task_id = get_task_id(creds, tasklist_ids[list_num], task_num)
+
+        # Accept new line character
+        note = note.replace('\\n', '\n')
         new_task = {'notes': note}
         try:
             # Update task
