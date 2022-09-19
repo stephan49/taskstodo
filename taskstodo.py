@@ -88,54 +88,63 @@ def auth_user():
     return creds
 
 
-def main():
+def show_lists():
     creds = auth_user()
+    tasklists.get_all_tasklists(creds, args.max_results, args.verbose)
+    return
 
+
+def manage_lists():
+    creds = auth_user()
+    if args.create:
+        tasklists.create_tasklist(creds, args.list_title, args.verbose)
+    elif args.delete:
+        tasklists.delete_tasklist(creds, args.list_title, args.list_num,
+                                  args.verbose)
+    elif args.update:
+        tasklists.update_tasklist(creds, args.list_title, args.update,
+                                  args.list_num, args.verbose)
+    else:
+        tasklists.get_tasklist(creds, args.list_title, args.list_num,
+                               args.verbose)
+    return
+
+
+def manage_tasks():
+    creds = auth_user()
+    if args.create:
+        tasks.create_task(creds, args.list_title, args.create, args.list_num,
+                          args.verbose)
+    elif args.delete:
+        tasks.delete_task(creds, args.list_title, args.task_num, args.list_num,
+                          args.verbose)
+    elif args.update:
+        tasks.update_task(creds, args.list_title, args.update, args.task_num,
+                          args.list_num, args.verbose)
+    elif args.note:
+        tasks.create_note(creds, args.list_title, args.note, args.task_num,
+                          args.list_num, args.verbose)
+    elif args.move or args.move == 0:
+        tasks.move_task(creds, args.list_title, args.move, args.task_num,
+                        args.list_num, args.verbose)
+    elif args.task_num != -1:
+        tasks.get_task(creds, args.list_title, args.task_num, args.list_num,
+                       args.verbose)
+    else:
+        tasklists.get_tasklist(creds, args.list_title, args.list_num,
+                               args.verbose)
+    return
+
+
+def main():
     if len(sys.argv) == 1:
         parser.print_usage()
-        return
-
-    if sys.argv[1] == CMDS[0]:
-        tasklists.get_all_tasklists(creds, args.max_results, args.verbose)
-        return
-
-    if sys.argv[1] == CMDS[1]:
-        if args.create:
-            tasklists.create_tasklist(creds, args.list_title, args.verbose)
-        elif args.delete:
-            tasklists.delete_tasklist(creds, args.list_title, args.list_num,
-                                      args.verbose)
-        elif args.update:
-            tasklists.update_tasklist(creds, args.list_title, args.update,
-                                      args.list_num, args.verbose)
-        else:
-            tasklists.get_tasklist(creds, args.list_title, args.list_num,
-                                   args.verbose)
-        return
-
-    if sys.argv[1] == CMDS[2]:
-        if args.create:
-            tasks.create_task(creds, args.list_title, args.create,
-                              args.list_num, args.verbose)
-        elif args.delete:
-            tasks.delete_task(creds, args.list_title, args.task_num,
-                              args.list_num, args.verbose)
-        elif args.update:
-            tasks.update_task(creds, args.list_title, args.update,
-                              args.task_num, args.list_num, args.verbose)
-        elif args.note:
-            tasks.create_note(creds, args.list_title, args.note,
-                              args.task_num, args.list_num, args.verbose)
-        elif args.move or args.move == 0:
-            tasks.move_task(creds, args.list_title, args.move,
-                            args.task_num, args.list_num, args.verbose)
-        elif args.task_num != -1:
-            tasks.get_task(creds, args.list_title, args.task_num,
-                           args.list_num, args.verbose)
-        else:
-            tasklists.get_tasklist(creds, args.list_title, args.list_num,
-                                   args.verbose)
-        return
+    elif sys.argv[1] == CMDS[0]:
+        show_lists()
+    elif sys.argv[1] == CMDS[1]:
+        manage_lists()
+    elif sys.argv[1] == CMDS[2]:
+        manage_tasks()
 
 
 if __name__ == '__main__':
