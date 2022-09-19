@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+Create, read, update or delete task lists.
+"""
+
 import json
 
 from googleapiclient.discovery import build
