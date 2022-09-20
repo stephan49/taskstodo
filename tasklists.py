@@ -77,7 +77,7 @@ def load_tasklist_cache():
         pass
 
 
-def get_duplicates(tasklist_ids):
+def print_duplicates(tasklist_ids):
     """
     Print task lists with duplicate titles
     """
@@ -114,7 +114,7 @@ def get_tasklist_ids(creds, title):
     return tasklist_ids
 
 
-def get_all_tasklists(creds, num_lists, verbose):
+def print_all_tasklists(creds, num_lists, verbose):
     """
     Print out all task lists.
     """
@@ -142,9 +142,9 @@ def get_all_tasklists(creds, num_lists, verbose):
             print('  - Updated: {0}'.format(item['updated']))
 
 
-def get_tasklist(creds, title, list_num, verbose):
+def get_tasklist(creds, title, list_num):
     """
-    Print out specific task list and its tasks.
+    Get specific task list and its tasks and return them as a dictionary.
     """
 
     service = build('tasks', 'v1', credentials=creds)
@@ -153,7 +153,7 @@ def get_tasklist(creds, title, list_num, verbose):
         print('Task list does not exist')
     elif len(tasklist_ids) > 1 and list_num == -1:
         # Show duplicate titled lists when no selection made
-        get_duplicates(tasklist_ids)
+        print_duplicates(tasklist_ids)
     else:
         if len(tasklist_ids) == 1 or list_num == -1:
             list_num = 0
@@ -165,32 +165,51 @@ def get_tasklist(creds, title, list_num, verbose):
             task_results = service.tasks().list(
                     tasklist=tasklist_ids[list_num]).execute()
         except HttpError as err:
-            if verbose:
-                print(err)
-            else:
-                print(err._get_reason())
+            print(err._get_reason())
             return
 
-        if verbose:
-            tasklist_id = tasklist_results.get('id')
-            tasklist_updated = tasklist_results.get('updated')
-            print('ID: {0}'.format(tasklist_id))
-            print('Updated: {0}'.format(tasklist_updated))
-            print()
+        tasklist = {}
+        tasklist['id'] = tasklist_results.get('id')
+        tasklist['updated'] = tasklist_results.get('updated')
 
-        print('Tasks:')
+        tasks = []
         task_items = task_results.get('items')
         # Sort task items by position key instead of update time
         task_items.sort(key=lambda task_items: task_items['position'])
-        for i in range(len(task_items)):
-            if verbose:
-                print('{0}. {1} (ID: {2})'.format(i, task_items[i]['title'],
-                                                  task_items[i]['id']))
-            else:
-                print('{0}. {1}'.format(i, task_items[i]['title']))
+        for j in range(len(task_items)):
+            tasks.append({'id': task_items[j]['id']})
+            tasks[j]['title'] = task_items[j]['title']
+            tasks[j]['updated'] = task_items[j]['updated']
+            tasks[j]['note'] = task_items[j].get('notes')
+            tasks[j]['position'] = int(task_items[j]['position'])
+        tasklist['tasks'] = tasks
 
-        # Update cache file
-        create_tasklist_cache(creds)
+        return tasklist
+
+
+def print_tasklist(creds, title, list_num, verbose):
+    """
+    Print out specific task list and its tasks.
+    """
+
+    tasklist = get_tasklist(creds, title, list_num)
+
+    if verbose:
+        print('ID: {0}'.format(tasklist['id']))
+        print('Updated: {0}'.format(tasklist['updated']))
+        print()
+
+    print('Tasks:')
+    tasks = tasklist.get('tasks')
+    for i, task in enumerate(tasks):
+        print('{0}. {1}'.format(i, task['title']))
+
+        if task['note']:
+            print('  - Note: {0}'.format(
+                task['note'].replace('\n', '\n          ')))
+
+        if verbose:
+            print('  - ID: {0}'.format(task['id']))
 
 
 def create_tasklist(creds, title, verbose):
@@ -225,7 +244,7 @@ def delete_tasklist(creds, title, list_num, verbose):
         print('Task list does not exist')
     elif len(tasklist_ids) > 1 and list_num == -1:
         # Show duplicate titled lists when no selection made
-        get_duplicates(tasklist_ids)
+        print_duplicates(tasklist_ids)
     else:
         if len(tasklist_ids) == 1 or list_num == -1:
             list_num = 0
@@ -255,7 +274,7 @@ def update_tasklist(creds, title, new_title, list_num, verbose):
         print('Task list does not exist')
     elif len(tasklist_ids) > 1 and list_num == -1:
         # Show duplicate titled lists when no selection made
-        get_duplicates(tasklist_ids)
+        print_duplicates(tasklist_ids)
     else:
         if len(tasklist_ids) == 1 or list_num == -1:
             list_num = 0

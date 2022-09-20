@@ -39,7 +39,7 @@ def get_task(creds, list_title, task_num, list_num, verbose):
         print('Task list does not exist')
     elif len(tasklist_ids) > 1 and list_num == -1:
         # Show duplicate titled lists when no selection made
-        tasklists.get_duplicates(tasklist_ids)
+        tasklists.print_duplicates(tasklist_ids)
     else:
         if len(tasklist_ids) == 1 or list_num == -1:
             list_num = 0
@@ -79,7 +79,7 @@ def create_task(creds, list_title, task_title, list_num, verbose):
         print('Task list does not exist')
     elif len(tasklist_ids) > 1 and list_num == -1:
         # Show duplicate titled lists when no selection made
-        tasklists.get_duplicates(tasklist_ids)
+        tasklists.print_duplicates(tasklist_ids)
     else:
         task = {'title': task_title}
         if len(tasklist_ids) == 1 or list_num == -1:
@@ -110,7 +110,7 @@ def delete_task(creds, list_title, task_num, list_num, verbose):
         print('Task list does not exist')
     elif len(tasklist_ids) > 1 and list_num == -1:
         # Show duplicate titled lists when no selection made
-        tasklists.get_duplicates(tasklist_ids)
+        tasklists.print_duplicates(tasklist_ids)
     else:
         if len(tasklist_ids) == 1 or list_num == -1:
             list_num = 0
@@ -141,7 +141,7 @@ def update_task(creds, list_title, task_title, task_num, list_num, verbose):
         print('Task list does not exist')
     elif len(tasklist_ids) > 1 and list_num == -1:
         # Show duplicate titled lists when no selection made
-        tasklists.get_duplicates(tasklist_ids)
+        tasklists.print_duplicates(tasklist_ids)
     else:
         if len(tasklist_ids) == 1 or list_num == -1:
             list_num = 0
@@ -173,7 +173,7 @@ def move_task(creds, list_title, position, task_num, list_num, verbose):
         print('Task list does not exist')
     elif len(tasklist_ids) > 1 and list_num == -1:
         # Show duplicate titled lists when no selection made
-        tasklists.get_duplicates(tasklist_ids)
+        tasklists.print_duplicates(tasklist_ids)
     else:
         if len(tasklist_ids) == 1 or list_num == -1:
             list_num = 0
@@ -212,7 +212,7 @@ def create_note(creds, list_title, note, task_num, list_num, verbose):
         print('Task list does not exist')
     elif len(tasklist_ids) > 1 and list_num == -1:
         # Show duplicate titled lists when no selection made
-        tasklists.get_duplicates(tasklist_ids)
+        tasklists.print_duplicates(tasklist_ids)
     else:
         if len(tasklist_ids) == 1 or list_num == -1:
             list_num = 0

@@ -90,7 +90,7 @@ def auth_user():
 
 def show_lists():
     creds = auth_user()
-    tasklists.get_all_tasklists(creds, args.max_results, args.verbose)
+    tasklists.print_all_tasklists(creds, args.max_results, args.verbose)
     return
 
 
@@ -105,8 +105,8 @@ def manage_lists():
         tasklists.update_tasklist(creds, args.list_title, args.update,
                                   args.list_num, args.verbose)
     else:
-        tasklists.get_tasklist(creds, args.list_title, args.list_num,
-                               args.verbose)
+        tasklists.print_tasklist(creds, args.list_title, args.list_num,
+                                 args.verbose)
     return
 
 
@@ -131,8 +131,8 @@ def manage_tasks():
         tasks.get_task(creds, args.list_title, args.task_num, args.list_num,
                        args.verbose)
     else:
-        tasklists.get_tasklist(creds, args.list_title, args.list_num,
-                               args.verbose)
+        tasklists.print_tasklist(creds, args.list_title, args.list_num,
+                                 args.verbose)
     return
 
 
