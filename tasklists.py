@@ -29,15 +29,16 @@ def create_tasklist_cache(creds):
 
     tasklist_items = tasklist_results.get('items')
     tasklists = []
-    for i in range(len(tasklist_items)):
-        tasklists.append({'id': tasklist_items[i]['id']})
-        tasklists[i]['title'] = tasklist_items[i]['title']
-        tasklists[i]['updated'] = tasklist_items[i]['updated']
+    for tasklist_item in tasklist_items:
+        tasklist = {}
+        tasklist['id'] = tasklist_item['id']
+        tasklist['title'] = tasklist_item['title']
+        tasklist['updated'] = tasklist_item['updated']
 
         try:
             # Get tasks
             task_results = service.tasks().list(
-                    tasklist=tasklist_items[i]['id']).execute()
+                    tasklist=tasklist_item['id']).execute()
         except HttpError as err:
             print(err)
             return
@@ -46,13 +47,17 @@ def create_tasklist_cache(creds):
         task_items = task_results.get('items')
         # Sort task items by position key instead of update time
         task_items.sort(key=lambda task_items: task_items['position'])
-        for j in range(len(task_items)):
-            tasks.append({'id': task_items[j]['id']})
-            tasks[j]['title'] = task_items[j]['title']
-            tasks[j]['updated'] = task_items[j]['updated']
-            tasks[j]['note'] = task_items[j].get('notes')
-            tasks[j]['position'] = int(task_items[j]['position'])
-        tasklists[i]['tasks'] = tasks
+        for task_item in task_items:
+            task = {}
+            task['id'] = task_item['id']
+            task['title'] = task_item['title']
+            task['updated'] = task_item['updated']
+            task['note'] = task_item.get('notes')
+            task['position'] = task_item['position']
+            tasks.append(task)
+
+        tasklist_item['tasks'] = tasks
+        tasklists.append(tasklist_item)
 
     with open(CACHE_FILE, 'w') as f:
         json.dump(tasklists, f, indent=4)
@@ -79,12 +84,12 @@ def load_tasklist_cache():
 
 def print_duplicates(tasklist_ids):
     """
-    Print task lists with duplicate titles
+    Print task lists with duplicate titles.
     """
 
     print('Multiple task lists with duplicate titles found:')
-    for i in range(len(tasklist_ids)):
-        print('{0}. ID: {1}'.format(i, tasklist_ids[i]))
+    for i, tasklist_id in enumerate(tasklist_ids):
+        print('{0}. ID: {1}'.format(i, tasklist_id))
     print('\nUse -l option to select list number')
 
 
@@ -176,12 +181,15 @@ def get_tasklist(creds, title, list_num):
         task_items = task_results.get('items')
         # Sort task items by position key instead of update time
         task_items.sort(key=lambda task_items: task_items['position'])
-        for j in range(len(task_items)):
-            tasks.append({'id': task_items[j]['id']})
-            tasks[j]['title'] = task_items[j]['title']
-            tasks[j]['updated'] = task_items[j]['updated']
-            tasks[j]['note'] = task_items[j].get('notes')
-            tasks[j]['position'] = int(task_items[j]['position'])
+        for task_item in task_items:
+            task = {}
+            task['id'] = task_item['id']
+            task['title'] = task_item['title']
+            task['updated'] = task_item['updated']
+            task['note'] = task_item.get('notes')
+            task['position'] = task_item['position']
+            tasks.append(task)
+
         tasklist['tasks'] = tasks
 
         return tasklist
