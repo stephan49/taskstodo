@@ -5,13 +5,14 @@ import os.path
 import argparse
 import tasklists
 import tasks
+import calcurse
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 
 SCOPES = ['https://www.googleapis.com/auth/tasks']
-CMDS = ['show-lists', 'list', 'task']
+CMDS = ['show-lists', 'list', 'task', 'sync-calcurse']
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description="Manage Google Tasks")
@@ -60,6 +61,9 @@ parser_task.add_argument('-v', '--verbose', action='store_true',
                          help='show verbose messages')
 parser_task.add_argument('list_title', type=str,
                          help='title of task list to use')
+
+parser_sync_calcurse = subparsers.add_parser(CMDS[3],
+                                             help='sync with calcurse tasks')
 
 args = parser.parse_args()
 
@@ -145,6 +149,9 @@ def main():
         manage_lists()
     elif sys.argv[1] == CMDS[2]:
         manage_tasks()
+    elif sys.argv[1] == CMDS[3]:
+        calcurse.sync_tasks()
+        return
 
 
 if __name__ == '__main__':
