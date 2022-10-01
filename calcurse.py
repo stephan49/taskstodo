@@ -5,9 +5,8 @@ Synchronize Google Tasks and calcurse TODO lists.
 """
 
 import os.path
+import tasklists
 
-
-DATA_DIR = os.path.expanduser('~/.local/share/calcurse/')
 
 
 def get_calcurse_tasks():
@@ -51,7 +50,25 @@ def get_calcurse_note(note_id):
     NOTE_FILE = os.path.join(DATA_DIR, 'notes', note_id)
 
     with open(NOTE_FILE) as f:
-        return f.read()
+        return f.read().rstrip('\n')
+
+
+def get_google_tasks(creds, list_title, list_num):
+    """
+    Get Google Tasks from server and return tasks as list.
+
+    Formats data to allow for comparison with calcurse.
+    """
+
+    tasks = tasklists.get_tasklist(creds, list_title, list_num)['tasks']
+    for task in tasks:
+        task.pop('id')
+        task.pop('updated')
+        task.pop('position')
+        if not task['note']:
+            task.pop('note')
+
+    return tasks
 
 
 def sync_tasks():

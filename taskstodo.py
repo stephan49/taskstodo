@@ -64,6 +64,12 @@ parser_task.add_argument('list_title', type=str,
 
 parser_sync_calcurse = subparsers.add_parser(CMDS[3],
                                              help='sync with calcurse tasks')
+parser_sync_calcurse.add_argument('list_title', type=str,
+                                  help='title of task list to use')
+parser_sync_calcurse.add_argument('-l', '--list', metavar='number', default=-1,
+                                  type=int, dest='list_num',
+                                  help='select task list')
+
 
 args = parser.parse_args()
 
@@ -140,6 +146,11 @@ def manage_tasks():
     return
 
 
+def sync_calcurse():
+    creds = auth_user()
+    calcurse.sync_tasks(creds, args.list_title, args.list_num)
+
+
 def main():
     if len(sys.argv) == 1:
         parser.print_usage()
@@ -150,8 +161,7 @@ def main():
     elif sys.argv[1] == CMDS[2]:
         manage_tasks()
     elif sys.argv[1] == CMDS[3]:
-        calcurse.sync_tasks()
-        return
+        sync_calcurse()
 
 
 if __name__ == '__main__':
