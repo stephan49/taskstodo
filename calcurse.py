@@ -5,6 +5,7 @@ Synchronize Google Tasks and calcurse TODO lists.
 """
 
 import os.path
+import hashlib
 import tasklists
 
 
@@ -51,6 +52,37 @@ def get_calcurse_note(note_id):
 
     with open(NOTE_FILE) as f:
         return f.read().rstrip('\n')
+
+
+def add_calcurse_note(note_id, note):
+    """
+    Add calcurse task note using hash of data as note ID and file name.
+    """
+
+    NOTE_FILE = os.path.join(DATA_DIR, 'notes', note_id)
+
+    with open(NOTE_FILE, 'w') as f:
+        f.write(note + '\n')
+
+
+def add_calcurse_tasks(tasks):
+    """
+    Add missing tasks to calcurse.
+    """
+
+    TODO_FILE = os.path.join(DATA_DIR, 'todo')
+
+    with open(TODO_FILE, 'a') as f:
+        for task in tasks:
+            if task.get('note'):
+                # Compute and add hash of note
+                note_bytes = bytes(f"{task['note']}\n", 'utf-8')
+                note_hash = hashlib.sha1(note_bytes).hexdigest()
+                f.write(f"[0]>{note_hash} {task['title']}\n")
+
+                add_calcurse_note(note_hash, task['note'])
+            else:
+                f.write(f"[0] {task['title']}\n")
 
 
 def get_google_tasks(creds, list_title, list_num):
