@@ -68,7 +68,7 @@ def get_task(creds, list_title, task_num, list_num, verbose):
         tasklists.create_tasklist_cache(creds)
 
 
-def create_task(creds, list_title, task_title, list_num, verbose):
+def create_task(creds, list_title, task_title, note, list_num, verbose):
     """
     Create new task on specified task list.
     """
@@ -82,6 +82,10 @@ def create_task(creds, list_title, task_title, list_num, verbose):
         tasklists.print_duplicates(tasklist_ids)
     else:
         task = {'title': task_title}
+
+        if note:
+            task['notes'] = note
+
         if len(tasklist_ids) == 1 or list_num == -1:
             list_num = 0
         try:

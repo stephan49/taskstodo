@@ -49,10 +49,10 @@ group_task.add_argument('-d', '--delete', action='store_true',
                         help='delete existing task')
 group_task.add_argument('-u', '--update', metavar='title', type=str,
                         help='update title of task')
-group_task.add_argument('-n', '--note', metavar='note', type=str,
-                        help='create note for task')
 group_task.add_argument('-m', '--move', metavar='number', type=int,
                         help='move task to new position')
+parser_task.add_argument('-n', '--note', metavar='note', type=str,
+                         help='create note for task')
 parser_task.add_argument('-t', '--task', metavar='number', default=-1,
                          dest='task_num', type=int, help='select task')
 parser_task.add_argument('-l', '--list', metavar='number', default=-1,
@@ -123,8 +123,8 @@ def manage_lists():
 def manage_tasks():
     creds = auth_user()
     if args.create:
-        tasks.create_task(creds, args.list_title, args.create, args.list_num,
-                          args.verbose)
+        tasks.create_task(creds, args.list_title, args.create, args.note,
+                          args.list_num, args.verbose)
     elif args.delete:
         tasks.delete_task(creds, args.list_title, args.task_num, args.list_num,
                           args.verbose)
