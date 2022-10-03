@@ -7,6 +7,8 @@ Synchronize Google Tasks and calcurse TODO lists.
 import os.path
 import hashlib
 import tasklists
+import tasks
+import pprint
 
 
 
@@ -65,7 +67,7 @@ def add_calcurse_note(note_id, note):
         f.write(note + '\n')
 
 
-def add_calcurse_tasks(tasks):
+def add_calcurse_tasks(new_tasks):
     """
     Add missing tasks to calcurse.
     """
@@ -73,7 +75,7 @@ def add_calcurse_tasks(tasks):
     TODO_FILE = os.path.join(DATA_DIR, 'todo')
 
     with open(TODO_FILE, 'a') as f:
-        for task in tasks:
+        for task in new_tasks:
             if task.get('note'):
                 # Compute and add hash of note
                 note_bytes = bytes(f"{task['note']}\n", 'utf-8')
@@ -103,6 +105,47 @@ def get_google_tasks(creds, list_title, list_num):
     return tasks
 
 
-def sync_tasks():
-    cc_tasks = get_calcurse_tasks()
-    print(cc_tasks)
+def add_google_tasks(creds, list_title, list_num, new_tasks):
+    """
+    Add missing tasks to Google Tasks.
+    """
+
+    for new_task in new_tasks:
+        tasks.create_task(creds, list_title, new_task['title'],
+                          new_task.get('note'), list_num, False)
+
+
+def sync_tasks(creds, list_title, list_num):
+    # Read in Google Tasks list
+    print('Google Tasks:')
+    g_tasks = get_google_tasks(creds, list_title, list_num)
+    pprint.pp(g_tasks)
+    print()
+
+    # Read in calcurse todo list
+    print('calcurse:')
+    c_tasks = get_calcurse_tasks()
+    pprint.pp(c_tasks)
+    print()
+
+    # Compare Google Tasks to calcurse and get missing tasks to add
+    new_c_tasks = []
+    print('Google Tasks not in calcurse:')
+    for g_task in g_tasks:
+        if g_task not in c_tasks:
+            new_c_tasks.append(g_task)
+            pprint.pp(g_task)
+
+    add_calcurse_tasks(new_c_tasks)
+
+    print()
+
+    # Compare calcurse to Google Tasks and get missing tasks to add
+    new_g_tasks = []
+    print('calcurse tasks not in Google Tasks:')
+    for c_task in c_tasks:
+        if c_task not in g_tasks:
+            new_g_tasks.append(c_task)
+            pprint.pp(c_task)
+
+    add_google_tasks(creds, list_title, list_num, new_g_tasks)
