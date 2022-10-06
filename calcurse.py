@@ -6,6 +6,8 @@ Synchronize Google Tasks and calcurse TODO lists.
 
 import os.path
 import hashlib
+import threading
+import time
 import tasklists
 import tasks
 import pprint
@@ -110,9 +112,12 @@ def add_google_tasks(creds, list_title, list_num, new_tasks):
     Add missing tasks to Google Tasks.
     """
 
-    for new_task in new_tasks:
-        tasks.create_task(creds, list_title, new_task['title'],
-                          new_task.get('note'), list_num, False)
+    for t, new_task in enumerate(list(reversed(new_tasks))):
+        t = threading.Thread(target=tasks.create_task,
+                             args=(creds, list_title, new_task['title'],
+                                   new_task.get('note'), list_num, False))
+        time.sleep(0.1)  # Helps keep insertion order of tasks
+        t.start()
 
 
 def sync_tasks(creds, list_title, list_num):
