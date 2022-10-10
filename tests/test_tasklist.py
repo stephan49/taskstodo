@@ -38,7 +38,7 @@ class TestTasklistFunctions(unittest.TestCase):
         self.authUser()
         self.title = 'test list'
 
-        # Capture stdout text to allow checking correctness of output
+        # Capture stdout to check correctness of output
         self.output = StringIO()
         sys.stdout = self.output
 
@@ -48,10 +48,10 @@ class TestTasklistFunctions(unittest.TestCase):
 
         tasklists.print_all_tasklists(self.creds, 100, False)
 
-        tasks = self.output.getvalue().splitlines()
-        tasks = [task.removeprefix('- ') for task in tasks]
+        lists = self.output.getvalue().splitlines()
+        lists = [lst.removeprefix('- ') for lst in lists]
 
-        self.assertIn(self.title, tasks)
+        self.assertIn(self.title, lists)
 
     def test_delete_tasklist(self):
         """Delete task list with specified title."""
@@ -59,10 +59,10 @@ class TestTasklistFunctions(unittest.TestCase):
 
         tasklists.print_all_tasklists(self.creds, 100, False)
 
-        tasks = self.output.getvalue().splitlines()
-        tasks = [task.removeprefix('- ') for task in tasks]
+        lists = self.output.getvalue().splitlines()
+        lists = [lst.removeprefix('- ') for lst in lists]
 
-        self.assertNotIn(self.title, tasks)
+        self.assertNotIn(self.title, lists)
 
 
 if __name__ == '__main__':
