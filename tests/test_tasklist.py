@@ -55,7 +55,9 @@ class TestTasklistFunctions(unittest.TestCase):
 
     def test_delete_tasklist(self):
         """Delete task list with specified title."""
-        tasklists.delete_tasklist(self.creds, self.title, 0, False)
+        tasklists.create_tasklist(self.creds, self.title, False)
+
+        tasklists.delete_tasklist(self.creds, self.title, -1, False)
 
         tasklists.print_all_tasklists(self.creds, 100, False)
 
