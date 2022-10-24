@@ -201,6 +201,8 @@ def print_tasklist(creds, title, list_num, verbose):
     """
 
     tasklist = get_tasklist(creds, title, list_num)
+    if not tasklist:
+        return
 
     if verbose:
         print('ID: {0}'.format(tasklist['id']))
