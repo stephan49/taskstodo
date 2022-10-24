@@ -4,6 +4,7 @@ import unittest
 import os
 import sys
 import tasklists
+import tasks
 
 from io import StringIO
 from google.auth.transport.requests import Request
@@ -53,6 +54,16 @@ class TestTasklistFunctions(unittest.TestCase):
 
         self.assertIn(self.title, lists)
 
+    def test_get_nonempty_tasklist(self):
+        """Get nonempty task list with specified title."""
+        tasklists.create_tasklist(self.creds, self.title, False)
+
+        task_title = 'test task'
+        tasks.create_task(self.creds, self.title, task_title, None, -1, False)
+
+        tasklists.print_tasklist(self.creds, self.title, -1, False)
+        self.assertIn(f'0. {task_title}', self.output.getvalue().splitlines())
+
     def test_delete_tasklist(self):
         """Delete task list with specified title."""
         tasklists.create_tasklist(self.creds, self.title, False)
@@ -65,6 +76,15 @@ class TestTasklistFunctions(unittest.TestCase):
         lists = [lst.removeprefix('- ') for lst in lists]
 
         self.assertNotIn(self.title, lists)
+
+    def tearDown(self):
+        """Cleanup test environment"""
+        self.output.close()
+
+        try:
+            tasklists.delete_tasklist(self.creds, self.title, -1, False)
+        except ValueError:
+            pass
 
 
 if __name__ == '__main__':
