@@ -64,6 +64,13 @@ class TestTasklistFunctions(unittest.TestCase):
         tasklists.print_tasklist(self.creds, self.title, -1, False)
         self.assertIn(f'0. {task_title}', self.output.getvalue().splitlines())
 
+    def test_get_empty_tasklist(self):
+        """Get empty task list with specified title."""
+        tasklists.create_tasklist(self.creds, self.title, False)
+
+        tasklists.print_tasklist(self.creds, self.title, -1, False)
+        self.assertEqual(1, len(self.output.getvalue().splitlines()))
+
     def test_delete_tasklist(self):
         """Delete task list with specified title."""
         tasklists.create_tasklist(self.creds, self.title, False)
