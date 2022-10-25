@@ -93,6 +93,22 @@ class TestTasklistFunctions(unittest.TestCase):
 
         self.assertNotIn(self.title, lists)
 
+    def test_update_tasklist(self):
+        """Update title of task list."""
+        tasklists.create_tasklist(self.creds, self.title, False)
+
+        new_title = 'new test list'
+        tasklists.update_tasklist(self.creds, self.title, new_title, -1, False)
+
+        tasklists.print_all_tasklists(self.creds, 100, False)
+
+        lists = self.output.getvalue().splitlines()
+        lists = [lst.removeprefix('- ') for lst in lists]
+
+        self.assertIn(new_title, lists)
+
+        tasklists.delete_tasklist(self.creds, new_title, 0, False)
+
     def tearDown(self):
         """Cleanup test environment"""
         self.output.truncate(0)
