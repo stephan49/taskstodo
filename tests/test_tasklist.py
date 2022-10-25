@@ -71,6 +71,15 @@ class TestTasklistFunctions(unittest.TestCase):
         tasklists.print_tasklist(self.creds, self.title, -1, False)
         self.assertEqual(1, len(self.output.getvalue().splitlines()))
 
+    def test_get_duplicate_titled_tasklist(self):
+        """Get task list with duplicate title."""
+        tasklists.create_tasklist(self.creds, self.title, False)
+        tasklists.create_tasklist(self.creds, self.title, False)
+
+        tasklists.print_tasklist(self.creds, self.title, -1, False)
+        self.assertIn('Multiple task lists with duplicate titles found:',
+                      self.output.getvalue().splitlines())
+
     def test_delete_tasklist(self):
         """Delete task list with specified title."""
         tasklists.create_tasklist(self.creds, self.title, False)
