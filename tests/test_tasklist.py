@@ -86,12 +86,16 @@ class TestTasklistFunctions(unittest.TestCase):
 
     def tearDown(self):
         """Cleanup test environment"""
+        self.output.truncate(0)
+
+        tasklists.print_all_tasklists(self.creds, 100, False)
+        num_lists = self.output.getvalue().splitlines().count(
+                f'- {self.title}')
+
         self.output.close()
 
-        try:
-            tasklists.delete_tasklist(self.creds, self.title, -1, False)
-        except ValueError:
-            pass
+        for _ in range(num_lists):
+            tasklists.delete_tasklist(self.creds, self.title, 0, False)
 
 
 if __name__ == '__main__':
