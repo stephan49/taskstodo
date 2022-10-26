@@ -82,6 +82,19 @@ class TestTaskFunctions(unittest.TestCase):
         self.assertIn(f'0. {new_title}',
                       self.output.getvalue().splitlines())
 
+    def test_create_note(self):
+        """Create task note."""
+        tasks.create_task(self.creds, self.list_title, self.task_title, None,
+                          -1, False)
+
+        note = 'test note'
+        tasks.create_note(self.creds, self.list_title, note, -1, -1, False)
+
+        tasklists.print_tasklist(self.creds, self.list_title, -1, False)
+
+        self.assertIn(f'  - Note: {note}',
+                      self.output.getvalue().splitlines())
+
     def tearDown(self):
         """Cleanup test environment"""
         self.output.truncate(0)
