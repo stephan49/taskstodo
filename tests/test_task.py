@@ -68,6 +68,20 @@ class TestTaskFunctions(unittest.TestCase):
         self.assertNotIn(f'0. {self.task_title}',
                          self.output.getvalue().splitlines())
 
+    def test_update_task(self):
+        """Update title of task."""
+        tasks.create_task(self.creds, self.list_title, self.task_title, None,
+                          -1, False)
+
+        new_title = 'new test task'
+        tasks.update_task(self.creds, self.list_title, new_title, -1, -1,
+                          False)
+
+        tasklists.print_tasklist(self.creds, self.list_title, -1, False)
+
+        self.assertIn(f'0. {new_title}',
+                      self.output.getvalue().splitlines())
+
     def tearDown(self):
         """Cleanup test environment"""
         self.output.truncate(0)
