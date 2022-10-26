@@ -47,7 +47,7 @@ class TestTaskFunctions(unittest.TestCase):
         sys.stdout = self.output
 
     def test_create_task(self):
-        """Create task list with specified title."""
+        """Create task with specified title."""
         tasks.create_task(self.creds, self.list_title, self.task_title, None,
                           -1, False)
 
@@ -55,6 +55,18 @@ class TestTaskFunctions(unittest.TestCase):
 
         self.assertIn(f'0. {self.task_title}',
                       self.output.getvalue().splitlines())
+
+    def test_delete_task(self):
+        """Delete task with specified title."""
+        tasks.create_task(self.creds, self.list_title, self.task_title, None,
+                          -1, False)
+
+        tasks.delete_task(self.creds, self.list_title, -1, -1, False)
+
+        tasklists.print_tasklist(self.creds, self.list_title, -1, False)
+
+        self.assertNotIn(f'0. {self.task_title}',
+                         self.output.getvalue().splitlines())
 
     def tearDown(self):
         """Cleanup test environment"""
