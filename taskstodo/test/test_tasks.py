@@ -96,6 +96,22 @@ class TestTaskFunctions(unittest.TestCase):
         self.assertIn(f'  - Note: {note}',
                       self.output.getvalue().splitlines())
 
+    def test_move_task(self):
+        """Move task to new position."""
+        tasks.create_task(self.creds, self.list_title, self.task_title, None,
+                          -1, False)
+
+        new_task = 'new test task'
+        tasks.create_task(self.creds, self.list_title, new_task, None, -1,
+                          False)
+
+        tasks.move_task(self.creds, self.list_title, 1, 0, -1, False)
+
+        tasklists.print_tasklist(self.creds, self.list_title, -1, False)
+
+        self.assertEquals(f'1. {new_task}',
+                          self.output.getvalue().splitlines()[2])
+
     def tearDown(self):
         """Cleanup test environment"""
         self.output.truncate(0)
