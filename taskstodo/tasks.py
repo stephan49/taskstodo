@@ -4,7 +4,7 @@
 Create, read, update or delete tasks.
 """
 
-import tasklists
+from . import tasklists
 
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError

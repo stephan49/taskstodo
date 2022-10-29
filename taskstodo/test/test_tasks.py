@@ -3,8 +3,9 @@
 import unittest
 import os
 import sys
-import tasklists
-import tasks
+
+from .. import tasklists
+from .. import tasks
 
 from io import StringIO
 from google.auth.transport.requests import Request

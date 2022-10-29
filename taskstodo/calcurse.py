@@ -8,8 +8,9 @@ import os.path
 import hashlib
 import threading
 import time
-import tasklists
-import tasks
+
+from . import tasklists
+from . import tasks
 import pprint
 
 

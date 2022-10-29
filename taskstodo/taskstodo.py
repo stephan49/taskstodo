@@ -3,9 +3,10 @@
 import sys
 import os.path
 import argparse
-import tasklists
-import tasks
-import calcurse
+
+from . import tasklists
+from . import tasks
+from . import calcurse
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
