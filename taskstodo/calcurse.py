@@ -97,15 +97,17 @@ def get_google_tasks(creds, list_title, list_num):
     Formats data to allow for comparison with calcurse.
     """
 
-    tasks = tasklists.get_tasklist(creds, list_title, list_num)['tasks']
-    for task in tasks:
-        task.pop('id')
-        task.pop('updated')
-        task.pop('position')
-        if not task['note']:
-            task.pop('note')
+    tasks = tasklists.get_tasklist(creds, list_title, list_num)
+    if tasks:
+        tasks = tasks['tasks']
+        for task in tasks:
+            task.pop('id')
+            task.pop('updated')
+            task.pop('position')
+            if not task['note']:
+                task.pop('note')
 
-    return tasks
+        return tasks
 
 
 def add_google_tasks(creds, list_title, list_num, new_tasks):
