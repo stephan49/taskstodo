@@ -13,6 +13,7 @@ from . import tasklists
 from . import tasks
 import pprint
 
+DATA_DIR = os.path.expanduser('~/.local/share/calcurse')
 
 
 def get_calcurse_tasks():
