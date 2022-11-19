@@ -13,15 +13,15 @@ from . import tasklists
 from . import tasks
 import pprint
 
-DATA_DIR = os.path.expanduser('~/.local/share/calcurse')
+#DATA_DIR = os.path.expanduser('~/.local/share/calcurse')
 
 
-def get_calcurse_tasks():
+def get_calcurse_tasks(data_dir=DATA_DIR):
     """
     Read in tasks from calcurse todo file and return tasks as a list.
     """
 
-    TODO_FILE = os.path.join(DATA_DIR, 'todo')
+    TODO_FILE = os.path.join(data_dir, 'todo')
 
     with open(TODO_FILE) as f:
         task_lines = f.readlines()
@@ -49,34 +49,34 @@ def get_calcurse_tasks():
     return tasks
 
 
-def get_calcurse_note(note_id):
+def get_calcurse_note(note_id, data_dir=DATA_DIR):
     """
     Read in note file of associated calcurse task and return as a string.
     """
 
-    NOTE_FILE = os.path.join(DATA_DIR, 'notes', note_id)
+    NOTE_FILE = os.path.join(data_dir, 'notes', note_id)
 
     with open(NOTE_FILE) as f:
         return f.read().rstrip('\n')
 
 
-def add_calcurse_note(note_id, note):
+def add_calcurse_note(note_id, note, data_dir=DATA_DIR):
     """
     Add calcurse task note using hash of data as note ID and file name.
     """
 
-    NOTE_FILE = os.path.join(DATA_DIR, 'notes', note_id)
+    NOTE_FILE = os.path.join(data_dir, 'notes', note_id)
 
     with open(NOTE_FILE, 'w') as f:
         f.write(note + '\n')
 
 
-def add_calcurse_tasks(new_tasks):
+def add_calcurse_tasks(new_tasks, data_dir=DATA_DIR):
     """
     Add missing tasks to calcurse.
     """
 
-    TODO_FILE = os.path.join(DATA_DIR, 'todo')
+    TODO_FILE = os.path.join(data_dir, 'todo')
 
     with open(TODO_FILE, 'a') as f:
         for task in new_tasks:
