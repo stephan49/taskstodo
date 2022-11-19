@@ -2,11 +2,13 @@
 
 import unittest
 import os
+import sys
 
 from .. import tasklists
 from .. import tasks
 from .. import calcurse
 
+from io import StringIO
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -47,6 +49,10 @@ class TestSyncFunctions(unittest.TestCase):
         with open(todo_file, 'w') as f:
             f.write('[0] test task 1\n[0] test task 2\n[0] test task 3\n')
 
+        # Capture stdout to check correctness of output
+        self.output = StringIO()
+        sys.stdout = self.output
+
     def test_get_calcurse_tasks(self):
         """Get tasks from calcurse."""
         calcurse_tasks = calcurse.get_calcurse_tasks(DATA_DIR)
@@ -55,6 +61,8 @@ class TestSyncFunctions(unittest.TestCase):
 
     def tearDown(self):
         """Cleanup test environment"""
+        self.output.truncate(0)
+
         tasklists.print_all_tasklists(self.creds, 100, False)
         num_lists = self.output.getvalue().splitlines().count(
                 f'- {self.list_title}')
