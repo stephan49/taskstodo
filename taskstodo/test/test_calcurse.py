@@ -59,6 +59,15 @@ class TestSyncFunctions(unittest.TestCase):
         calcurse_task = {'title': 'test task 1'}
         self.assertIn(calcurse_task, calcurse_tasks)
 
+    def test_add_calcurse_tasks(self):
+        """Add tasks to calcurse."""
+        task_name = 'test task 4'
+        new_task = [{'title': task_name}]
+        calcurse.add_calcurse_tasks(new_task, DATA_DIR)
+
+        calcurse_tasks = calcurse.get_calcurse_tasks(DATA_DIR)
+        self.assertIn(new_task[0], calcurse_tasks)
+
     def tearDown(self):
         """Cleanup test environment"""
         self.output.truncate(0)
