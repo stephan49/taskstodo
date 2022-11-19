@@ -3,6 +3,7 @@
 import unittest
 import os
 import sys
+import hashlib
 
 from .. import tasklists
 from .. import tasks
@@ -45,9 +46,22 @@ class TestSyncFunctions(unittest.TestCase):
         tasklists.create_tasklist(self.creds, self.list_title, False)
 
         # Create calcurse tasks file and tasks
-        todo_file = os.path.join(DATA_DIR, 'todo')
-        with open(todo_file, 'w') as f:
-            f.write('[0] test task 1\n[0] test task 2\n[0] test task 3\n')
+        with open(os.path.join(DATA_DIR, 'todo'), 'w') as f:
+            f.write('[0] test task 1\n[0] test task 2\n')
+
+            notes_dir = os.path.join(DATA_DIR, 'notes')
+            try:
+                os.mkdir(notes_dir)
+            except FileExistsError:
+                pass
+
+            # Create calcurse task note
+            note_bytes = bytes('test note', 'utf-8')
+            note_hash = hashlib.sha1(note_bytes).hexdigest()
+            f.write(f"[0]>{note_hash} test task 3\n")
+
+            with open(os.path.join(notes_dir, note_hash), 'w') as f:
+                f.write('test note\n')
 
         # Capture stdout to check correctness of output
         self.output = StringIO()
