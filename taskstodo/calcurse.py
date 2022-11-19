@@ -37,7 +37,8 @@ def get_calcurse_tasks(data_dir=DATA_DIR):
             note_id = task_line.split()[0][4:]
             task_line = task_line[task_slice].split()[1:]
             task_line = ' '.join(task_line)
-            note = get_calcurse_note(note_id)
+            with open(os.path.join(data_dir, 'notes', note_id)) as f:
+                note = f.read().rstrip('\n')
 
             task['title'] = task_line
             task['note'] = note
@@ -47,28 +48,6 @@ def get_calcurse_tasks(data_dir=DATA_DIR):
         tasks.append(task)
 
     return tasks
-
-
-def get_calcurse_note(note_id, data_dir=DATA_DIR):
-    """
-    Read in note file of associated calcurse task and return as a string.
-    """
-
-    NOTE_FILE = os.path.join(data_dir, 'notes', note_id)
-
-    with open(NOTE_FILE) as f:
-        return f.read().rstrip('\n')
-
-
-def add_calcurse_note(note_id, note, data_dir=DATA_DIR):
-    """
-    Add calcurse task note using hash of data as note ID and file name.
-    """
-
-    NOTE_FILE = os.path.join(data_dir, 'notes', note_id)
-
-    with open(NOTE_FILE, 'w') as f:
-        f.write(note + '\n')
 
 
 def add_calcurse_tasks(new_tasks, data_dir=DATA_DIR):
@@ -86,7 +65,8 @@ def add_calcurse_tasks(new_tasks, data_dir=DATA_DIR):
                 note_hash = hashlib.sha1(note_bytes).hexdigest()
                 f.write(f"[0]>{note_hash} {task['title']}\n")
 
-                add_calcurse_note(note_hash, task['note'])
+                with open(os.path.join(data_dir, 'notes', note_hash), 'w') as f:
+                    f.write(task['note'] + '\n')
             else:
                 f.write(f"[0] {task['title']}\n")
 
