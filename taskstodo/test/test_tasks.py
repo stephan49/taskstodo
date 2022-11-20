@@ -113,7 +113,7 @@ class TestTaskFunctions(unittest.TestCase):
                           self.output.getvalue().splitlines()[2])
 
     def tearDown(self):
-        """Cleanup test environment"""
+        """Cleanup test environment."""
         self.output.truncate(0)
 
         tasklists.print_all_tasklists(self.creds, 100, False)

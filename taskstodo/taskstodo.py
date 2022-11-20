@@ -71,7 +71,6 @@ parser_sync_calcurse.add_argument('-l', '--list', metavar='number', default=-1,
                                   type=int, dest='list_num',
                                   help='select task list')
 
-
 args = parser.parse_args()
 
 

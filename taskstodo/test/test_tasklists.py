@@ -111,7 +111,7 @@ class TestTasklistFunctions(unittest.TestCase):
         tasklists.delete_tasklist(self.creds, new_title, 0, False)
 
     def tearDown(self):
-        """Cleanup test environment"""
+        """Cleanup test environment."""
         self.output.truncate(0)
 
         tasklists.print_all_tasklists(self.creds, 100, False)

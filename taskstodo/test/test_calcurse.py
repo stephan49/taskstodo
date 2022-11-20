@@ -85,7 +85,7 @@ class TestSyncFunctions(unittest.TestCase):
         self.assertEqual(task_note, calcurse_tasks[3]['note'])
 
     def tearDown(self):
-        """Cleanup test environment"""
+        """Cleanup test environment."""
         self.output.truncate(0)
 
         tasklists.print_all_tasklists(self.creds, 100, False)
@@ -96,3 +96,7 @@ class TestSyncFunctions(unittest.TestCase):
 
         for _ in range(num_lists):
             tasklists.delete_tasklist(self.creds, self.list_title, 0, False)
+
+
+if __name__ == '__main__':
+    unittest.main()
