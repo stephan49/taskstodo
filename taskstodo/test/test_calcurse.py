@@ -95,6 +95,17 @@ class TestSyncFunctions(unittest.TestCase):
         google_task = {'title': 'test task 0', 'note': 'test note'}
         self.assertIn(google_task, google_tasks)
 
+    def test_add_google_tasks(self):
+        """Add tasks to Google."""
+
+        new_task_1 = {'title': 'test task 5'}
+        new_task_2 = {'title': 'test task 6', 'note': 'test note'}
+        new_tasks = [new_task_1, new_task_2]
+
+        calcurse.add_google_tasks(self.creds, self.list_title, -1, new_tasks)
+        self.assertIn(new_task_1, new_tasks)
+        self.assertIn(new_task_2, new_tasks)
+
     def tearDown(self):
         """Cleanup test environment."""
         self.output.truncate(0)
