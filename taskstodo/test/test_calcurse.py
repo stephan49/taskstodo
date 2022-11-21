@@ -45,6 +45,10 @@ class TestSyncFunctions(unittest.TestCase):
         self.list_title = 'test list'
         tasklists.create_tasklist(self.creds, self.list_title, False)
 
+        # Create Google tasks
+        tasks.create_task(self.creds, self.list_title, 'test task 0',
+                          'test note', -1, False)
+
         # Create calcurse tasks file and tasks
         with open(os.path.join(DATA_DIR, 'todo'), 'w') as f:
             f.write('[0] test task 1\n[0] test task 2\n')
@@ -83,6 +87,13 @@ class TestSyncFunctions(unittest.TestCase):
         calcurse_tasks = calcurse.get_calcurse_tasks(DATA_DIR)
         self.assertIn(new_task[0], calcurse_tasks)
         self.assertEqual(task_note, calcurse_tasks[3]['note'])
+
+    def test_get_google_tasks(self):
+        """Get tasks from Google."""
+        google_tasks = calcurse.get_google_tasks(self.creds, self.list_title,
+                                                 -1)
+        google_task = {'title': 'test task 0', 'note': 'test note'}
+        self.assertIn(google_task, google_tasks)
 
     def tearDown(self):
         """Cleanup test environment."""
