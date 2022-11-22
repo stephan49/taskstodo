@@ -100,43 +100,44 @@ def add_google_tasks(creds, list_title, list_num, new_tasks):
         t.start()
 
 
-def sync_tasks(creds, list_title, list_num, data_dir=DATA_DIR):
+def sync_tasks(creds, list_title, list_num, verbose, data_dir=DATA_DIR):
     """
     Sync Google and calcurse tasks.
     """
 
     # Read in Google Tasks list
-    print('Google Tasks:')
     g_tasks = get_google_tasks(creds, list_title, list_num)
     if g_tasks is None:
         return
-    pprint.pp(g_tasks)
-    print()
 
     # Read in calcurse todo list
-    print('calcurse:')
     c_tasks = get_calcurse_tasks(data_dir)
-    pprint.pp(c_tasks)
-    print()
 
     # Compare Google Tasks to calcurse and get missing tasks to add
     new_c_tasks = []
-    print('Google Tasks not in calcurse:')
     for g_task in g_tasks:
         if g_task not in c_tasks:
             new_c_tasks.append(g_task)
-            pprint.pp(g_task)
 
     add_calcurse_tasks(new_c_tasks, data_dir)
 
-    print()
-
     # Compare calcurse to Google Tasks and get missing tasks to add
     new_g_tasks = []
-    print('calcurse tasks not in Google Tasks:')
     for c_task in c_tasks:
         if c_task not in g_tasks:
             new_g_tasks.append(c_task)
-            pprint.pp(c_task)
 
     add_google_tasks(creds, list_title, list_num, new_g_tasks)
+
+    if verbose:
+        print('Google Tasks:')
+        pprint.pp(g_tasks)
+        print()
+        print('calcurse:')
+        pprint.pp(c_tasks)
+        print()
+        print('Google Tasks not in calcurse:')
+        pprint.pp(new_c_tasks)
+        print()
+        print('calcurse tasks not in Google Tasks:')
+        pprint.pp(new_g_tasks)

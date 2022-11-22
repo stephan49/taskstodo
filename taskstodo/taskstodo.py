@@ -70,6 +70,8 @@ parser_sync_calcurse.add_argument('list_title', type=str,
 parser_sync_calcurse.add_argument('-l', '--list', metavar='number', default=-1,
                                   type=int, dest='list_num',
                                   help='select task list')
+parser_sync_calcurse.add_argument('-v', '--verbose', action='store_true',
+                                  help='show verbose messages')
 
 args = parser.parse_args()
 
@@ -148,7 +150,7 @@ def manage_tasks():
 
 def sync_calcurse():
     creds = auth_user()
-    calcurse.sync_tasks(creds, args.list_title, args.list_num)
+    calcurse.sync_tasks(creds, args.list_title, args.list_num, args.verbose)
 
 
 def main():
