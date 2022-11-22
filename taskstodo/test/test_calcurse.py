@@ -17,7 +17,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 DATA_DIR = os.path.join(os.getcwd(), 'caldurse')
 
 
-class TestSyncFunctions(unittest.TestCase):
+class TestCalcurseFunctions(unittest.TestCase):
     """Test calcurse sync functions."""
 
     def authUser(self):
@@ -105,6 +105,22 @@ class TestSyncFunctions(unittest.TestCase):
         calcurse.add_google_tasks(self.creds, self.list_title, -1, new_tasks)
         self.assertIn(new_task_1, new_tasks)
         self.assertIn(new_task_2, new_tasks)
+
+    def test_sync_tasks(self):
+        """Sync Google and calcurse tasks."""
+
+        new_g_task = [{'title': 'google task'}]
+        new_c_task = [{'title': 'calcurse task'}]
+        calcurse.add_calcurse_tasks(new_g_task, DATA_DIR)
+        calcurse.add_google_tasks(self.creds, self.list_title, -1, new_c_task)
+
+        google_tasks = calcurse.get_google_tasks(self.creds, self.list_title,
+                                                 -1)
+        calcurse_tasks = calcurse.get_calcurse_tasks(DATA_DIR)
+
+        calcurse.sync_tasks(self.creds, self.list_title, -1, DATA_DIR)
+        self.assertIn(new_g_task[0], calcurse_tasks)
+        self.assertIn(new_c_task[0], google_tasks)
 
     def tearDown(self):
         """Cleanup test environment."""
