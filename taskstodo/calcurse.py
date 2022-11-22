@@ -21,9 +21,7 @@ def get_calcurse_tasks(data_dir=DATA_DIR):
     Read in tasks from calcurse todo file and return tasks as a list.
     """
 
-    TODO_FILE = os.path.join(data_dir, 'todo')
-
-    with open(TODO_FILE) as f:
+    with open(os.path.join(data_dir, 'todo')) as f:
         task_lines = f.readlines()
 
     tasks = []
@@ -55,9 +53,7 @@ def add_calcurse_tasks(new_tasks, data_dir=DATA_DIR):
     Add missing tasks to calcurse.
     """
 
-    TODO_FILE = os.path.join(data_dir, 'todo')
-
-    with open(TODO_FILE, 'a') as f:
+    with open(os.path.join(data_dir, 'todo'), 'a') as f:
         for task in new_tasks:
             if task.get('note'):
                 # Compute and add hash of note
@@ -104,7 +100,11 @@ def add_google_tasks(creds, list_title, list_num, new_tasks):
         t.start()
 
 
-def sync_tasks(creds, list_title, list_num):
+def sync_tasks(creds, list_title, list_num, data_dir=DATA_DIR):
+    """
+    Sync Google and calcurse tasks.
+    """
+
     # Read in Google Tasks list
     print('Google Tasks:')
     g_tasks = get_google_tasks(creds, list_title, list_num)
@@ -113,7 +113,7 @@ def sync_tasks(creds, list_title, list_num):
 
     # Read in calcurse todo list
     print('calcurse:')
-    c_tasks = get_calcurse_tasks()
+    c_tasks = get_calcurse_tasks(data_dir)
     pprint.pp(c_tasks)
     print()
 
@@ -125,7 +125,7 @@ def sync_tasks(creds, list_title, list_num):
             new_c_tasks.append(g_task)
             pprint.pp(g_task)
 
-    add_calcurse_tasks(new_c_tasks)
+    add_calcurse_tasks(new_c_tasks, data_dir)
 
     print()
 
