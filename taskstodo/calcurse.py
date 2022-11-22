@@ -108,7 +108,7 @@ def sync_tasks(creds, list_title, list_num, data_dir=DATA_DIR):
     # Read in Google Tasks list
     print('Google Tasks:')
     g_tasks = get_google_tasks(creds, list_title, list_num)
-    if not g_tasks:
+    if g_tasks is None:
         return
     pprint.pp(g_tasks)
     print()
