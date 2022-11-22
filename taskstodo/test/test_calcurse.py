@@ -14,7 +14,7 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-DATA_DIR = os.path.join(os.getcwd(), 'caldurse')
+DATA_DIR = os.path.join(os.getcwd(), 'calcurse')
 
 
 class TestCalcurseFunctions(unittest.TestCase):
@@ -48,6 +48,11 @@ class TestCalcurseFunctions(unittest.TestCase):
         # Create Google tasks
         tasks.create_task(self.creds, self.list_title, 'test task 0',
                           'test note', -1, False)
+
+        try:
+            os.mkdir(DATA_DIR)
+        except FileExistsError:
+            pass
 
         # Create calcurse tasks file and tasks
         with open(os.path.join(DATA_DIR, 'todo'), 'w') as f:
