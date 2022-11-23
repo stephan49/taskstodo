@@ -162,7 +162,7 @@ def sync_tasks(creds, list_title, list_num, verbose, data_dir=DATA_DIR):
     add_google_tasks(creds, list_title, list_num, new_g_tasks)
 
     # Updated synced tasks
-    synced_tasks = get_calcurse_tasks(data_dir) + new_c_tasks
+    synced_tasks = get_calcurse_tasks(data_dir)
 
     with open(sync_file, 'w') as f:
         json.dump(synced_tasks, f)
