@@ -8,10 +8,11 @@ import os.path
 import hashlib
 import threading
 import time
+import json
+import pprint
 
 from . import tasklists
 from . import tasks
-import pprint
 
 #DATA_DIR = os.path.expanduser('~/.local/share/calcurse')
 
@@ -50,7 +51,7 @@ def get_calcurse_tasks(data_dir=DATA_DIR):
 
 def add_calcurse_tasks(new_tasks, data_dir=DATA_DIR):
     """
-    Add missing tasks to calcurse.
+    Add tasks to calcurse.
     """
 
     with open(os.path.join(data_dir, 'todo'), 'a') as f:
@@ -65,6 +66,23 @@ def add_calcurse_tasks(new_tasks, data_dir=DATA_DIR):
                     f.write(task['note'] + '\n')
             else:
                 f.write(f"[0] {task['title']}\n")
+
+
+def delete_calcurse_tasks(old_tasks, data_dir=DATA_DIR):
+    """
+    Delete tasks from calcurse.
+    """
+
+    todo_file = os.path.join(data_dir, 'todo')
+    with open(todo_file, 'r') as f:
+        cur_tasks = f.readlines()
+
+    old_tasks = [t['title'] for t in old_tasks]
+    with open(todo_file, 'w') as f:
+        for task in cur_tasks:
+            task_string = ' '.join(task.split()[1:])
+            if task_string not in old_tasks:
+                f.write(task)
 
 
 def get_google_tasks(creds, list_title, list_num):
@@ -89,7 +107,7 @@ def get_google_tasks(creds, list_title, list_num):
 
 def add_google_tasks(creds, list_title, list_num, new_tasks):
     """
-    Add missing tasks to Google Tasks.
+    Add tasks to Google Tasks.
     """
 
     for t, new_task in enumerate(list(reversed(new_tasks))):
@@ -105,6 +123,15 @@ def sync_tasks(creds, list_title, list_num, verbose, data_dir=DATA_DIR):
     Sync Google and calcurse tasks.
     """
 
+    # Read in synced task list if available
+    sync_file = os.path.join(DATA_DIR, 'sync.json')
+    synced_tasks = []
+    try:
+        with open(sync_file, 'r') as f:
+            synced_tasks = json.load(f)
+    except FileNotFoundError:
+        pass
+
     # Read in Google Tasks list
     g_tasks = get_google_tasks(creds, list_title, list_num)
     if g_tasks is None:
@@ -113,7 +140,7 @@ def sync_tasks(creds, list_title, list_num, verbose, data_dir=DATA_DIR):
     # Read in calcurse todo list
     c_tasks = get_calcurse_tasks(data_dir)
 
-    # Compare Google Tasks to calcurse and get missing tasks to add
+    # Compare Google Tasks to calcurse and get tasks to add or delete
     new_c_tasks = []
     for g_task in g_tasks:
         if g_task not in c_tasks:
@@ -121,13 +148,24 @@ def sync_tasks(creds, list_title, list_num, verbose, data_dir=DATA_DIR):
 
     add_calcurse_tasks(new_c_tasks, data_dir)
 
-    # Compare calcurse to Google Tasks and get missing tasks to add
+    # Compare calcurse to Google Tasks and get tasks to add or delete
     new_g_tasks = []
+    del_c_tasks = []
     for c_task in c_tasks:
         if c_task not in g_tasks:
-            new_g_tasks.append(c_task)
+            if c_task not in synced_tasks:
+                new_g_tasks.append(c_task)
+            else:
+                del_c_tasks.append(c_task)
 
+    delete_calcurse_tasks(del_c_tasks, data_dir)
     add_google_tasks(creds, list_title, list_num, new_g_tasks)
+
+    # Updated synced tasks
+    synced_tasks = get_calcurse_tasks(data_dir) + new_c_tasks
+
+    with open(sync_file, 'w') as f:
+        json.dump(synced_tasks, f)
 
     if verbose:
         print('Google Tasks:')
