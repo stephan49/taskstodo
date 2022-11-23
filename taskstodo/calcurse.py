@@ -105,6 +105,22 @@ def get_google_tasks(creds, list_title, list_num):
         return tasks
 
 
+def delete_google_tasks(creds, list_title, old_tasks):
+    """
+    Delete tasks from Google.
+    """
+
+    cur_tasks = tasklists.get_tasklist(creds, list_title, -1)['tasks']
+    cur_tasks = [t['title'] for t in cur_tasks]
+    old_tasks = [t['title'] for t in old_tasks]
+
+    # Delete tasks in reverse order to prevent shifting index
+    for task in reversed(old_tasks):
+        if task in cur_tasks:
+            task_num = cur_tasks.index(task)
+            tasks.delete_task(creds, list_title, task_num, -1, False)
+
+
 def add_google_tasks(creds, list_title, list_num, new_tasks):
     """
     Add tasks to Google Tasks.
@@ -142,10 +158,15 @@ def sync_tasks(creds, list_title, list_num, verbose, data_dir=DATA_DIR):
 
     # Compare Google Tasks to calcurse and get tasks to add or delete
     new_c_tasks = []
+    del_g_tasks = []
     for g_task in g_tasks:
         if g_task not in c_tasks:
-            new_c_tasks.append(g_task)
+            if g_task not in synced_tasks:
+                new_c_tasks.append(g_task)
+            else:
+                del_g_tasks.append(g_task)
 
+    delete_google_tasks(creds, list_title, del_g_tasks)
     add_calcurse_tasks(new_c_tasks, data_dir)
 
     # Compare calcurse to Google Tasks and get tasks to add or delete
