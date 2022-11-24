@@ -140,7 +140,7 @@ def sync_tasks(creds, list_title, list_num, verbose, data_dir=DATA_DIR):
     """
 
     # Read in synced task list if available
-    sync_file = os.path.join(DATA_DIR, 'sync.json')
+    sync_file = os.path.join(DATA_DIR, 'taskstodo-sync.json')
     synced_tasks = []
     try:
         with open(sync_file, 'r') as f:
@@ -158,28 +158,28 @@ def sync_tasks(creds, list_title, list_num, verbose, data_dir=DATA_DIR):
 
     # Compare Google Tasks to calcurse and get tasks to add or delete
     new_c_tasks = []
-    del_g_tasks = []
+    old_g_tasks = []
     for g_task in g_tasks:
         if g_task not in c_tasks:
             if g_task not in synced_tasks:
                 new_c_tasks.append(g_task)
             else:
-                del_g_tasks.append(g_task)
+                old_g_tasks.append(g_task)
 
-    delete_google_tasks(creds, list_title, del_g_tasks)
+    delete_google_tasks(creds, list_title, old_g_tasks)
     add_calcurse_tasks(new_c_tasks, data_dir)
 
     # Compare calcurse to Google Tasks and get tasks to add or delete
     new_g_tasks = []
-    del_c_tasks = []
+    old_c_tasks = []
     for c_task in c_tasks:
         if c_task not in g_tasks:
             if c_task not in synced_tasks:
                 new_g_tasks.append(c_task)
             else:
-                del_c_tasks.append(c_task)
+                old_c_tasks.append(c_task)
 
-    delete_calcurse_tasks(del_c_tasks, data_dir)
+    delete_calcurse_tasks(old_c_tasks, data_dir)
     add_google_tasks(creds, list_title, list_num, new_g_tasks)
 
     # Updated synced tasks
@@ -198,6 +198,6 @@ def sync_tasks(creds, list_title, list_num, verbose, data_dir=DATA_DIR):
         print('\nGoogle tasks added:')
         pprint.pp(new_g_tasks)
         print('\ncalcurse tasks deleted:')
-        pprint.pp(del_c_tasks)
+        pprint.pp(old_c_tasks)
         print('\nGoogle tasks deleted:')
-        pprint.pp(del_g_tasks)
+        pprint.pp(old_g_tasks)
