@@ -140,7 +140,7 @@ def sync_tasks(creds, list_title, list_num, verbose, data_dir=DATA_DIR):
     """
 
     # Read in synced task list if available
-    sync_file = os.path.join(DATA_DIR, 'taskstodo-sync.json')
+    sync_file = os.path.join(data_dir, 'taskstodo-sync.json')
     synced_tasks = []
     try:
         with open(sync_file, 'r') as f:

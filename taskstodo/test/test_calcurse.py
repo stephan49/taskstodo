@@ -123,7 +123,7 @@ class TestCalcurseFunctions(unittest.TestCase):
                                                  -1)
         calcurse_tasks = calcurse.get_calcurse_tasks(DATA_DIR)
 
-        calcurse.sync_tasks(self.creds, self.list_title, -1, DATA_DIR)
+        calcurse.sync_tasks(self.creds, self.list_title, -1, False, DATA_DIR)
         self.assertIn(new_g_task[0], calcurse_tasks)
         self.assertIn(new_c_task[0], google_tasks)
 
