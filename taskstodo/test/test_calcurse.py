@@ -93,6 +93,14 @@ class TestCalcurseFunctions(unittest.TestCase):
         self.assertIn(new_task[0], calcurse_tasks)
         self.assertEqual(task_note, calcurse_tasks[3]['note'])
 
+    def test_delete_calcurse_tasks(self):
+        """Delete tasks from calcurse."""
+        old_task = [{'title': 'test task 2'}]
+        calcurse.delete_calcurse_tasks(old_task, DATA_DIR)
+
+        calcurse_tasks = calcurse.get_calcurse_tasks(DATA_DIR)
+        self.assertNotIn(old_task[0], calcurse_tasks)
+
     def test_get_google_tasks(self):
         """Get tasks from Google."""
         google_tasks = calcurse.get_google_tasks(self.creds, self.list_title,
