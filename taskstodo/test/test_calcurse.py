@@ -4,6 +4,7 @@ import unittest
 import os
 import sys
 import hashlib
+import glob
 
 from .. import tasklists
 from .. import tasks
@@ -162,6 +163,7 @@ class TestCalcurseFunctions(unittest.TestCase):
         """Cleanup test environment."""
         self.output.truncate(0)
 
+        # Clean up Google task lists
         tasklists.print_all_tasklists(self.creds, 100, False)
         num_lists = self.output.getvalue().splitlines().count(
                 f'- {self.list_title}')
@@ -170,6 +172,13 @@ class TestCalcurseFunctions(unittest.TestCase):
 
         for _ in range(num_lists):
             tasklists.delete_tasklist(self.creds, self.list_title, 0, False)
+
+        # Clean up calcurse data directory
+        files = glob.glob(os.path.join(DATA_DIR, '**'), recursive=True)
+        for f in files:
+            if os.path.isfile(f):
+                os.remove(f)
+        os.removedirs(os.path.join(os.path.basename(DATA_DIR), 'notes'))
 
 
 if __name__ == '__main__':
