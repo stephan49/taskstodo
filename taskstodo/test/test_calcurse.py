@@ -133,16 +133,30 @@ class TestCalcurseFunctions(unittest.TestCase):
 
         new_g_task = [{'title': 'google task'}]
         new_c_task = [{'title': 'calcurse task'}]
-        calcurse.add_calcurse_tasks(new_g_task, DATA_DIR)
-        calcurse.add_google_tasks(self.creds, self.list_title, -1, new_c_task)
 
+        # Test syncing added tasks
+        calcurse.add_calcurse_tasks(new_c_task, DATA_DIR)
+        calcurse.add_google_tasks(self.creds, self.list_title, -1, new_g_task)
+        calcurse.sync_tasks(self.creds, self.list_title, -1, False, DATA_DIR)
         google_tasks = calcurse.get_google_tasks(self.creds, self.list_title,
                                                  -1)
         calcurse_tasks = calcurse.get_calcurse_tasks(DATA_DIR)
-
-        calcurse.sync_tasks(self.creds, self.list_title, -1, False, DATA_DIR)
         self.assertIn(new_g_task[0], calcurse_tasks)
+        self.assertIn(new_g_task[0], google_tasks)
+        self.assertIn(new_c_task[0], calcurse_tasks)
         self.assertIn(new_c_task[0], google_tasks)
+
+        # Test syncing deleted tasks
+        calcurse.delete_calcurse_tasks(new_c_task, DATA_DIR)
+        calcurse.delete_google_tasks(self.creds, self.list_title, new_g_task)
+        calcurse.sync_tasks(self.creds, self.list_title, -1, False, DATA_DIR)
+        google_tasks = calcurse.get_google_tasks(self.creds, self.list_title,
+                                                 -1)
+        calcurse_tasks = calcurse.get_calcurse_tasks(DATA_DIR)
+        self.assertNotIn(new_g_task[0], calcurse_tasks)
+        self.assertNotIn(new_g_task[0], google_tasks)
+        self.assertNotIn(new_c_task[0], calcurse_tasks)
+        self.assertNotIn(new_c_task[0], google_tasks)
 
     def tearDown(self):
         """Cleanup test environment."""
