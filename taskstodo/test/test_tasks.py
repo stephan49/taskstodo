@@ -109,8 +109,8 @@ class TestTaskFunctions(unittest.TestCase):
 
         tasklists.print_tasklist(self.creds, self.list_title, -1, False)
 
-        self.assertEquals(f'1. {new_task}',
-                          self.output.getvalue().splitlines()[2])
+        self.assertEqual(f'1. {new_task}',
+                         self.output.getvalue().splitlines()[2])
 
     def tearDown(self):
         """Cleanup test environment."""
