@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-import os.path
+import os
 import argparse
 
 from . import tasklists
@@ -14,6 +14,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 
 SCOPES = ['https://www.googleapis.com/auth/tasks']
 CMDS = ['show-lists', 'list', 'task', 'sync-calcurse']
+CFG_DIR = os.path.expanduser('~/.config/taskstodo')
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description="Manage Google Tasks")
@@ -82,19 +83,25 @@ def auth_user():
     Return valid credentials for use with services.
     """
 
+    if not os.path.exists(CFG_DIR):
+        os.mkdir(CFG_DIR)
+
+    token_file = os.path.join(CFG_DIR, 'token.json')
+    creds_file = os.path.join(CFG_DIR, 'credentials.json')
+
     creds = None
-    if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    if os.path.exists(token_file):
+        creds = Credentials.from_authorized_user_file(token_file, SCOPES)
     # If there are no valid credentials available, let user login
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                    'credentials.json', SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file(creds_file,
+                                                             SCOPES)
             creds = flow.run_local_server(port=0)
         # Save credentials for next run
-        with open('token.json', 'w') as token:
+        with open(token_file, 'w') as token:
             token.write(creds.to_json())
 
     return creds
