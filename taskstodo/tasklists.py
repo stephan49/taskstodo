@@ -4,12 +4,14 @@
 Create, read, update or delete task lists.
 """
 
+import os
 import json
 
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-CACHE_FILE = 'tasklists.json'
+DATA_DIR = os.path.expanduser('~/.local/share/taskstodo')
+CACHE_FILE = os.path.join(DATA_DIR, 'tasklists.json')
 
 
 def create_tasklist_cache(creds):
@@ -58,6 +60,9 @@ def create_tasklist_cache(creds):
 
         tasklist_item['tasks'] = tasks
         tasklists.append(tasklist_item)
+
+    if not os.path.exists(DATA_DIR):
+        os.mkdir(DATA_DIR)
 
     with open(CACHE_FILE, 'w') as f:
         json.dump(tasklists, f, indent=4)

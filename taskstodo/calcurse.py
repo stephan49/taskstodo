@@ -139,8 +139,12 @@ def sync_tasks(creds, list_title, list_num, verbose, data_dir=DATA_DIR):
     Sync Google and calcurse tasks.
     """
 
+    taskstodo_data_dir = os.path.expanduser('~/.local/share/taskstodo')
+    if not os.path.exists(taskstodo_data_dir):
+        os.mkdir(taskstodo_data_dir)
+
     # Read in synced task list if available
-    sync_file = os.path.join(data_dir, 'taskstodo-sync.json')
+    sync_file = os.path.join(taskstodo_data_dir, 'calcurse-sync.json')
     synced_tasks = []
     try:
         with open(sync_file, 'r') as f:
