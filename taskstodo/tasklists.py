@@ -175,8 +175,14 @@ def get_tasklist(creds, title, list_num):
             task_results = service.tasks().list(
                     tasklist=tasklist_ids[list_num]).execute()
         except HttpError as err:
-            print(err._get_reason())
-            return
+            if err._get_reason() == 'Task list not found.':
+                # Update cache file and try again in case tasklist was
+                # deleted and recreated on server with same title
+                create_tasklist_cache(creds)
+                return get_tasklist(creds, title, list_num)
+            else:
+                print(err._get_reason())
+                return
 
         tasklist = {}
         tasklist['id'] = tasklist_results.get('id')
