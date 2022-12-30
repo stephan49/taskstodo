@@ -6,9 +6,9 @@ import sys
 import hashlib
 import glob
 
-from .. import tasklists
-from .. import tasks
-from .. import calcurse
+from taskstodo import tasklists
+from taskstodo import tasks
+from taskstodo import calcurse
 
 from io import StringIO
 from google.auth.transport.requests import Request
