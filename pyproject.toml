@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "taskstodo"
+version = "0.0.1"
+dependencies = [
+    "google-api-python-client",
+    "google-auth-httplib2",
+    "google-auth-oauthlib",
+]
+authors = [ { name="Stephan T" } ]
+description = "Manage Google Tasks from the command-line and sync tasks with other apps."
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: POSIX :: Linux",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/stephan-t/taskstodo"
+"Bug Tracker" = "https://github.com/stephan-t/taskstodo/issues"
+
+[project.scripts]
+taskstodo = "taskstodo.taskstodo:main"

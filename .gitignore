@@ -1,4 +1,7 @@
 .env/
+Session.vim
 __pycache__/
 credentials.json
+dist/
+taskstodo.egg-info/
 token.json
