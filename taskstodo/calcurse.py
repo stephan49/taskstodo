@@ -4,7 +4,8 @@
 Synchronize Google Tasks and calcurse TODO lists.
 """
 
-import os.path
+import os
+import sys
 import hashlib
 import threading
 import time
@@ -143,6 +144,14 @@ def sync_tasks(creds, list_title, list_num, verbose, data_dir=DATA_DIR):
     if not os.path.exists(taskstodo_data_dir):
         os.mkdir(taskstodo_data_dir)
 
+    # Check for or create lock file to prevent multiple running instances
+    lock = os.path.join(taskstodo_data_dir, 'lock')
+    if os.path.exists(lock):
+        print('An existing instance is already running', file=sys.stderr)
+        sys.exit(1)
+    else:
+        os.mknod(lock, mode=0o644)
+
     # Read in synced task list if available
     sync_file = os.path.join(taskstodo_data_dir, 'calcurse-sync.json')
     synced_tasks = []
@@ -191,6 +200,8 @@ def sync_tasks(creds, list_title, list_num, verbose, data_dir=DATA_DIR):
 
     with open(sync_file, 'w') as f:
         json.dump(synced_tasks, f)
+
+    os.remove(lock)
 
     if verbose:
         print('Google tasks:')
