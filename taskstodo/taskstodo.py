@@ -97,9 +97,16 @@ def auth_user():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
+            if not os.path.exists(creds_file):
+                print('Credentials file does not exist.', file=sys.stderr)
+                print('Setup credentials on Google Cloud and create:',
+                      creds_file, file=sys.stderr)
+                sys.exit(1)
+
             flow = InstalledAppFlow.from_client_secrets_file(creds_file,
                                                              SCOPES)
             creds = flow.run_local_server(port=0)
+
         # Save credentials for next run
         with open(token_file, 'w') as token:
             token.write(creds.to_json())
