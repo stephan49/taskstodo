@@ -147,7 +147,7 @@ def sync_tasks(creds, list_title, list_num, verbose, data_dir=DATA_DIR):
     # Check for or create lock file to prevent multiple running instances
     lock = os.path.join(taskstodo_data_dir, 'lock')
     if os.path.exists(lock):
-        print('An existing instance is already running', file=sys.stderr)
+        print('An existing instance is already running or lock was not released.', file=sys.stderr)
         sys.exit(1)
     else:
         os.mknod(lock, mode=0o644)
@@ -161,47 +161,48 @@ def sync_tasks(creds, list_title, list_num, verbose, data_dir=DATA_DIR):
     except FileNotFoundError:
         pass
 
-    # Read in Google Tasks list
-    g_tasks = get_google_tasks(creds, list_title, list_num)
-    if g_tasks is None:
-        return
+    try:
+        # Read in Google Tasks list
+        g_tasks = get_google_tasks(creds, list_title, list_num)
+        if g_tasks is None:
+            return
 
-    # Read in calcurse todo list
-    c_tasks = get_calcurse_tasks(data_dir)
+        # Read in calcurse todo list
+        c_tasks = get_calcurse_tasks(data_dir)
 
-    # Compare Google Tasks to calcurse and get tasks to add or delete
-    new_c_tasks = []
-    old_g_tasks = []
-    for g_task in g_tasks:
-        if g_task not in c_tasks:
-            if g_task not in synced_tasks:
-                new_c_tasks.append(g_task)
-            else:
-                old_g_tasks.append(g_task)
+        # Compare Google Tasks to calcurse and get tasks to add or delete
+        new_c_tasks = []
+        old_g_tasks = []
+        for g_task in g_tasks:
+            if g_task not in c_tasks:
+                if g_task not in synced_tasks:
+                    new_c_tasks.append(g_task)
+                else:
+                    old_g_tasks.append(g_task)
 
-    delete_google_tasks(creds, list_title, old_g_tasks)
-    add_calcurse_tasks(new_c_tasks, data_dir)
+        delete_google_tasks(creds, list_title, old_g_tasks)
+        add_calcurse_tasks(new_c_tasks, data_dir)
 
-    # Compare calcurse to Google Tasks and get tasks to add or delete
-    new_g_tasks = []
-    old_c_tasks = []
-    for c_task in c_tasks:
-        if c_task not in g_tasks:
-            if c_task not in synced_tasks:
-                new_g_tasks.append(c_task)
-            else:
-                old_c_tasks.append(c_task)
+        # Compare calcurse to Google Tasks and get tasks to add or delete
+        new_g_tasks = []
+        old_c_tasks = []
+        for c_task in c_tasks:
+            if c_task not in g_tasks:
+                if c_task not in synced_tasks:
+                    new_g_tasks.append(c_task)
+                else:
+                    old_c_tasks.append(c_task)
 
-    delete_calcurse_tasks(old_c_tasks, data_dir)
-    add_google_tasks(creds, list_title, list_num, new_g_tasks)
+        delete_calcurse_tasks(old_c_tasks, data_dir)
+        add_google_tasks(creds, list_title, list_num, new_g_tasks)
 
-    # Updated synced tasks
-    synced_tasks = get_calcurse_tasks(data_dir)
+        # Updated synced tasks
+        synced_tasks = get_calcurse_tasks(data_dir)
 
-    with open(sync_file, 'w') as f:
-        json.dump(synced_tasks, f)
-
-    os.remove(lock)
+        with open(sync_file, 'w') as f:
+            json.dump(synced_tasks, f)
+    finally:
+        os.remove(lock)
 
     if verbose:
         print('Google tasks:')
