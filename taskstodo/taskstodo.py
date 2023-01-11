@@ -11,6 +11,7 @@ from . import calcurse
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
+from httplib2.error import ServerNotFoundError
 
 SCOPES = ['https://www.googleapis.com/auth/tasks']
 CMDS = ['show-lists', 'list', 'task', 'sync-calcurse']
@@ -170,14 +171,19 @@ def sync_calcurse():
 def main():
     if len(sys.argv) == 1:
         parser.print_usage()
-    elif sys.argv[1] == CMDS[0]:
-        show_lists()
-    elif sys.argv[1] == CMDS[1]:
-        manage_lists()
-    elif sys.argv[1] == CMDS[2]:
-        manage_tasks()
-    elif sys.argv[1] == CMDS[3]:
-        sync_calcurse()
+    else:
+        try:
+            if sys.argv[1] == CMDS[0]:
+                show_lists()
+            elif sys.argv[1] == CMDS[1]:
+                manage_lists()
+            elif sys.argv[1] == CMDS[2]:
+                manage_tasks()
+            elif sys.argv[1] == CMDS[3]:
+                sync_calcurse()
+        except ServerNotFoundError:
+            print('Failed to connect to server.', file=sys.stderr)
+            sys.exit(1)
 
 
 if __name__ == '__main__':
