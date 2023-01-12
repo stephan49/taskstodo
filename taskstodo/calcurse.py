@@ -63,8 +63,8 @@ def add_calcurse_tasks(new_tasks, data_dir=DATA_DIR):
                 note_hash = hashlib.sha1(note_bytes).hexdigest()
                 f.write(f"[0]>{note_hash} {task['title']}\n")
 
-                with open(os.path.join(data_dir, 'notes', note_hash), 'w') as f:
-                    f.write(task['note'] + '\n')
+                with open(os.path.join(data_dir, 'notes', note_hash), 'w') as n:
+                    n.write(task['note'] + '\n')
             else:
                 f.write(f"[0] {task['title']}\n")
 
