@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "taskstodo"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
     "google-api-python-client",
     "google-auth-httplib2",
