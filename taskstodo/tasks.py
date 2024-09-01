@@ -18,7 +18,8 @@ def get_task_id(creds, list_id, task_num):
     service = build('tasks', 'v1', credentials=creds)
     try:
         # Get all tasks in list
-        results = service.tasks().list(tasklist=list_id).execute()
+        results = service.tasks().list(
+                tasklist=list_id, maxResults=100).execute()
     except HttpError as err:
         print(err)
 

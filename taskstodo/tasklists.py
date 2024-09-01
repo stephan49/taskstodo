@@ -40,7 +40,7 @@ def create_tasklist_cache(creds):
         try:
             # Get tasks
             task_results = service.tasks().list(
-                    tasklist=tasklist_item['id']).execute()
+                    tasklist=tasklist_item['id'], maxResults=100).execute()
         except HttpError as err:
             print(err)
             return
@@ -173,7 +173,7 @@ def get_tasklist(creds, title, list_num):
                     tasklist=tasklist_ids[list_num]).execute()
             # Get tasks for task list
             task_results = service.tasks().list(
-                    tasklist=tasklist_ids[list_num]).execute()
+                    tasklist=tasklist_ids[list_num], maxResults=100).execute()
         except HttpError as err:
             if err._get_reason() == 'Task list not found.':
                 # Update cache file and try again in case tasklist was
@@ -223,14 +223,14 @@ def print_tasklist(creds, title, list_num, verbose):
     print('Tasks:')
     tasks = tasklist.get('tasks')
     for i, task in enumerate(tasks):
-        print('{0}. {1}'.format(i, task['title']))
+        print('{0}. {1}'.format(i+1, task['title']))
 
         if task['note']:
-            print('  - Note: {0}'.format(
-                task['note'].replace('\n', '\n          ')))
+            print('  Note: {0}'.format(
+                task['note'].replace('\n', '\n        ')))
 
         if verbose:
-            print('  - ID: {0}'.format(task['id']))
+            print('  ID: {0}'.format(task['id']))
 
 
 def create_tasklist(creds, title, verbose):
