@@ -21,8 +21,8 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/stephan-t/taskstodo"
-"Bug Tracker" = "https://github.com/stephan-t/taskstodo/issues"
+"Homepage" = "https://github.com/stephan49/taskstodo"
+"Bug Tracker" = "https://github.com/stephan49/taskstodo/issues"
 
 [project.scripts]
 taskstodo = "taskstodo.taskstodo:main"
