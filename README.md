@@ -40,7 +40,37 @@ taskstodo show-lists
 Show tasks:
 
 ```
-taskstodo tasks <list_title>
+taskstodo list <list_title>
+```
+
+Update task list:
+
+```
+taskstodo list -u <new_title> -t <task_number> <list_title>
+```
+
+Update task:
+
+```
+taskstodo task -u <new_title> -t <task_number> <list_title>
+```
+
+Move task:
+
+```
+taskstodo task -m <new_position> -t <task_number> <list_title>
+```
+
+Delete task:
+
+```
+taskstodo task -d -t <task_number> <list_title>
+```
+
+Delete task list:
+
+```
+taskstodo list -d <list_title>
 ```
 
 Sync calcurse and Google Tasks:
