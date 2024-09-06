@@ -105,12 +105,19 @@ class TestTaskFunctions(unittest.TestCase):
         tasks.create_task(self.creds, self.list_title, new_task, None, None,
                           False)
 
-        tasks.move_task(self.creds, self.list_title, 1, 0, -1, False)
-
-        tasklists.print_tasklist(self.creds, self.list_title, -1, False)
-
-        self.assertEqual(f'1. {new_task}',
+        # Move task down
+        tasks.move_task(self.creds, self.list_title, 1, 0, None, False)
+        tasklists.print_tasklist(self.creds, self.list_title, None, False)
+        self.assertEqual(f'2. {new_task}',
                          self.output.getvalue().splitlines()[2])
+
+        self.output.truncate(0)
+
+        # Move task up
+        tasks.move_task(self.creds, self.list_title, 0, 1, None, False)
+        tasklists.print_tasklist(self.creds, self.list_title, None, False)
+        self.assertEqual(f'1. {new_task}',
+                         self.output.getvalue().splitlines()[1])
 
     def tearDown(self):
         """Cleanup test environment."""
