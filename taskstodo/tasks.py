@@ -192,6 +192,9 @@ def move_task(creds, list_title, new_pos, task_num, list_num, verbose):
     Move task to new position in task list.
     """
 
+    if new_pos == task_num:
+        return
+
     service = build('tasks', 'v1', credentials=creds)
     tasklist_ids = tasklists.get_tasklist_ids(creds, list_title)
     if not tasklist_ids:
@@ -204,13 +207,26 @@ def move_task(creds, list_title, new_pos, task_num, list_num, verbose):
             list_num = 0
 
         task_id = get_task_id(creds, tasklist_ids[list_num], task_num)
+        if task_id is None:
+            print('Invalid task number')
+            return
 
-        if position >= 0:
+        out_of_range = False
+        if new_pos >= 0:
+            # Check if task is moving up or down
+            if new_pos < task_num:
+                new_pos = new_pos - 1
             # ID of task that will be previous to moved task
-            prev_id = get_task_id(creds, tasklist_ids[list_num], position)
+            prev_id = get_task_id(creds, tasklist_ids[list_num], new_pos)
+
+            if prev_id is None and new_pos != -1:
+                out_of_range = True
         else:
-            # Set position to top
-            prev_id = None
+            out_of_range = True
+
+        if out_of_range:
+            print("New position is out of range")
+            return
 
         try:
             # Move task
