@@ -37,7 +37,7 @@ group_list.add_argument('-d', '--delete', action='store_true',
                         help='delete existing task list')
 group_list.add_argument('-u', '--update', metavar='title', type=str,
                         help='update title of task list')
-parser_list.add_argument('-l', '--list', metavar='number', default=-1,
+parser_list.add_argument('-l', '--list', metavar='number', default=None,
                          type=int, dest='list_num', help='select task list')
 parser_list.add_argument('-v', '--verbose', action='store_true',
                          help='show verbose messages')
@@ -52,13 +52,14 @@ group_task.add_argument('-d', '--delete', action='store_true',
                         help='delete existing task')
 group_task.add_argument('-u', '--update', metavar='title', type=str,
                         help='update title of task')
-group_task.add_argument('-m', '--move', metavar='number', type=int,
+group_task.add_argument('-m', '--move', metavar='number', default=None,
+                        dest='new_pos', type=int,
                         help='move task to new position')
 parser_task.add_argument('-n', '--note', metavar='note', type=str,
                          help='create note for task')
-parser_task.add_argument('-t', '--task', metavar='number', default=-1,
+parser_task.add_argument('-t', '--task', metavar='number', default=None,
                          dest='task_num', type=int, help='select task')
-parser_task.add_argument('-l', '--list', metavar='number', default=-1,
+parser_task.add_argument('-l', '--list', metavar='number', default=None,
                          dest='list_num', type=int, help='select task list')
 parser_task.add_argument('-v', '--verbose', action='store_true',
                          help='show verbose messages')
@@ -69,13 +70,21 @@ parser_sync_calcurse = subparsers.add_parser(CMDS[3],
                                              help='sync with calcurse tasks')
 parser_sync_calcurse.add_argument('list_title', type=str,
                                   help='title of task list to use')
-parser_sync_calcurse.add_argument('-l', '--list', metavar='number', default=-1,
-                                  type=int, dest='list_num',
+parser_sync_calcurse.add_argument('-l', '--list', metavar='number',
+                                  default=None, type=int, dest='list_num',
                                   help='select task list')
 parser_sync_calcurse.add_argument('-v', '--verbose', action='store_true',
                                   help='show verbose messages')
 
 args = parser.parse_args()
+
+# Convert arguments to zero-based numbering
+if "list_num" in vars(args) and args.list_num is not None:
+    args.list_num = args.list_num - 1
+if "task_num" in vars(args) and args.task_num is not None:
+    args.task_num = args.task_num - 1
+if "new_pos" in vars(args) and args.new_pos is not None:
+    args.new_pos = args.new_pos - 1
 
 
 def auth_user():
@@ -151,10 +160,10 @@ def manage_tasks():
     elif args.note:
         tasks.create_note(creds, args.list_title, args.note, args.task_num,
                           args.list_num, args.verbose)
-    elif args.move or args.move == 0:
-        tasks.move_task(creds, args.list_title, args.move, args.task_num,
+    elif args.new_pos is not None:
+        tasks.move_task(creds, args.list_title, args.new_pos, args.task_num,
                         args.list_num, args.verbose)
-    elif args.task_num != -1:
+    elif args.task_num is not None:
         tasks.get_task(creds, args.list_title, args.task_num, args.list_num,
                        args.verbose)
     else:

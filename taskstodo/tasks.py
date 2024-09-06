@@ -20,6 +20,11 @@ def get_task_id(creds, list_id, task_num):
         # Get all tasks in list
         results = service.tasks().list(
                 tasklist=list_id, maxResults=100).execute()
+
+        # Ensure task number is within range
+        if task_num is None or task_num > len(
+                results['items']) - 1 or task_num < 0:
+            return None
     except HttpError as err:
         print(err)
 
@@ -38,13 +43,18 @@ def get_task(creds, list_title, task_num, list_num, verbose):
     tasklist_ids = tasklists.get_tasklist_ids(creds, list_title)
     if not tasklist_ids:
         print('Task list does not exist')
-    elif len(tasklist_ids) > 1 and list_num == -1:
-        # Show duplicate titled lists when no selection made
+    elif len(tasklist_ids) > 1 and (list_num is None or list_num < 0
+                                    or list_num > len(tasklist_ids) - 1):
         tasklists.print_duplicates(tasklist_ids)
     else:
-        if len(tasklist_ids) == 1 or list_num == -1:
+        if len(tasklist_ids) == 1 or list_num is None:
             list_num = 0
+
         task_id = get_task_id(creds, tasklist_ids[list_num], task_num)
+        if task_id is None:
+            print('Invalid task number')
+            return
+
         try:
             # Get task
             results = service.tasks().get(tasklist=tasklist_ids[list_num],
@@ -78,8 +88,8 @@ def create_task(creds, list_title, task_title, note, list_num, verbose):
     tasklist_ids = tasklists.get_tasklist_ids(creds, list_title)
     if not tasklist_ids:
         print('Task list does not exist')
-    elif len(tasklist_ids) > 1 and list_num == -1:
-        # Show duplicate titled lists when no selection made
+    elif len(tasklist_ids) > 1 and (list_num is None or list_num < 0
+                                    or list_num > len(tasklist_ids) - 1):
         tasklists.print_duplicates(tasklist_ids)
     else:
         task = {'title': task_title}
@@ -87,7 +97,7 @@ def create_task(creds, list_title, task_title, note, list_num, verbose):
         if note:
             task['notes'] = note
 
-        if len(tasklist_ids) == 1 or list_num == -1:
+        if len(tasklist_ids) == 1 or list_num is None:
             list_num = 0
         try:
             # Create task
@@ -113,13 +123,18 @@ def delete_task(creds, list_title, task_num, list_num, verbose):
     tasklist_ids = tasklists.get_tasklist_ids(creds, list_title)
     if not tasklist_ids:
         print('Task list does not exist')
-    elif len(tasklist_ids) > 1 and list_num == -1:
-        # Show duplicate titled lists when no selection made
+    elif len(tasklist_ids) > 1 and (list_num is None or list_num < 0
+                                    or list_num > len(tasklist_ids) - 1):
         tasklists.print_duplicates(tasklist_ids)
     else:
-        if len(tasklist_ids) == 1 or list_num == -1:
+        if len(tasklist_ids) == 1 or list_num is None:
             list_num = 0
+
         task_id = get_task_id(creds, tasklist_ids[list_num], task_num)
+        if task_id is None:
+            print('Invalid task number')
+            return
+
         try:
             # Get task
             service.tasks().delete(tasklist=tasklist_ids[list_num],
@@ -144,13 +159,18 @@ def update_task(creds, list_title, task_title, task_num, list_num, verbose):
     tasklist_ids = tasklists.get_tasklist_ids(creds, list_title)
     if not tasklist_ids:
         print('Task list does not exist')
-    elif len(tasklist_ids) > 1 and list_num == -1:
-        # Show duplicate titled lists when no selection made
+    elif len(tasklist_ids) > 1 and (list_num is None or list_num < 0
+                                    or list_num > len(tasklist_ids) - 1):
         tasklists.print_duplicates(tasklist_ids)
     else:
-        if len(tasklist_ids) == 1 or list_num == -1:
+        if len(tasklist_ids) == 1 or list_num is None:
             list_num = 0
+
         task_id = get_task_id(creds, tasklist_ids[list_num], task_num)
+        if task_id is None:
+            print('Invalid task number')
+            return
+
         new_task = {'title': task_title}
         try:
             # Update task
@@ -167,7 +187,7 @@ def update_task(creds, list_title, task_title, task_num, list_num, verbose):
         tasklists.create_tasklist_cache(creds)
 
 
-def move_task(creds, list_title, position, task_num, list_num, verbose):
+def move_task(creds, list_title, new_pos, task_num, list_num, verbose):
     """
     Move task to new position in task list.
     """
@@ -176,12 +196,13 @@ def move_task(creds, list_title, position, task_num, list_num, verbose):
     tasklist_ids = tasklists.get_tasklist_ids(creds, list_title)
     if not tasklist_ids:
         print('Task list does not exist')
-    elif len(tasklist_ids) > 1 and list_num == -1:
-        # Show duplicate titled lists when no selection made
+    elif len(tasklist_ids) > 1 and (list_num is None or list_num < 0
+                                    or list_num > len(tasklist_ids) - 1):
         tasklists.print_duplicates(tasklist_ids)
     else:
-        if len(tasklist_ids) == 1 or list_num == -1:
+        if len(tasklist_ids) == 1 or list_num is None:
             list_num = 0
+
         task_id = get_task_id(creds, tasklist_ids[list_num], task_num)
 
         if position >= 0:
@@ -215,13 +236,17 @@ def create_note(creds, list_title, note, task_num, list_num, verbose):
     tasklist_ids = tasklists.get_tasklist_ids(creds, list_title)
     if not tasklist_ids:
         print('Task list does not exist')
-    elif len(tasklist_ids) > 1 and list_num == -1:
-        # Show duplicate titled lists when no selection made
+    elif len(tasklist_ids) > 1 and (list_num is None or list_num < 0
+                                    or list_num > len(tasklist_ids) - 1):
         tasklists.print_duplicates(tasklist_ids)
     else:
-        if len(tasklist_ids) == 1 or list_num == -1:
+        if len(tasklist_ids) == 1 or list_num is None:
             list_num = 0
+
         task_id = get_task_id(creds, tasklist_ids[list_num], task_num)
+        if task_id is None:
+            print('Invalid task number')
+            return
 
         # Accept new line character
         note = note.replace('\\n', '\n')

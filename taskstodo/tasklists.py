@@ -94,7 +94,7 @@ def print_duplicates(tasklist_ids):
 
     print('Multiple task lists with duplicate titles found:')
     for i, tasklist_id in enumerate(tasklist_ids):
-        print('{0}. ID: {1}'.format(i, tasklist_id))
+        print('{0}. ID: {1}'.format(i + 1, tasklist_id))
     print('\nUse -l option to select list number')
 
 
@@ -161,11 +161,11 @@ def get_tasklist(creds, title, list_num):
     tasklist_ids = get_tasklist_ids(creds, title)
     if not tasklist_ids:
         print('Task list does not exist')
-    elif len(tasklist_ids) > 1 and list_num == -1:
-        # Show duplicate titled lists when no selection made
+    elif len(tasklist_ids) > 1 and (list_num is None or list_num < 0
+                                    or list_num > len(tasklist_ids) - 1):
         print_duplicates(tasklist_ids)
     else:
-        if len(tasklist_ids) == 1 or list_num == -1:
+        if len(tasklist_ids) == 1 or list_num is None:
             list_num = 0
         try:
             # Get task list
@@ -263,11 +263,11 @@ def delete_tasklist(creds, title, list_num, verbose):
     tasklist_ids = get_tasklist_ids(creds, title)
     if not tasklist_ids:
         print('Task list does not exist')
-    elif len(tasklist_ids) > 1 and list_num == -1:
-        # Show duplicate titled lists when no selection made
+    elif len(tasklist_ids) > 1 and (list_num is None or list_num < 0
+                                    or list_num > len(tasklist_ids) - 1):
         print_duplicates(tasklist_ids)
     else:
-        if len(tasklist_ids) == 1 or list_num == -1:
+        if len(tasklist_ids) == 1 or list_num is None:
             list_num = 0
         try:
             # Delete task list
@@ -293,11 +293,11 @@ def update_tasklist(creds, title, new_title, list_num, verbose):
     tasklist_ids = get_tasklist_ids(creds, title)
     if not tasklist_ids:
         print('Task list does not exist')
-    elif len(tasklist_ids) > 1 and list_num == -1:
-        # Show duplicate titled lists when no selection made
+    elif len(tasklist_ids) > 1 and (list_num is None or list_num < 0
+                                    or list_num > len(tasklist_ids) - 1):
         print_duplicates(tasklist_ids)
     else:
-        if len(tasklist_ids) == 1 or list_num == -1:
+        if len(tasklist_ids) == 1 or list_num is None:
             list_num = 0
         new_tasklist = {"title": new_title}
         try:
