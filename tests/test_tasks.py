@@ -50,59 +50,59 @@ class TestTaskFunctions(unittest.TestCase):
     def test_create_task(self):
         """Create task with specified title."""
         tasks.create_task(self.creds, self.list_title, self.task_title, None,
-                          -1, False)
+                          None, False)
 
-        tasklists.print_tasklist(self.creds, self.list_title, -1, False)
+        tasklists.print_tasklist(self.creds, self.list_title, None, False)
 
-        self.assertIn(f'0. {self.task_title}',
+        self.assertIn(f'1. {self.task_title}',
                       self.output.getvalue().splitlines())
 
     def test_delete_task(self):
         """Delete task with specified title."""
         tasks.create_task(self.creds, self.list_title, self.task_title, None,
-                          -1, False)
+                          None, False)
 
-        tasks.delete_task(self.creds, self.list_title, -1, -1, False)
+        tasks.delete_task(self.creds, self.list_title, 0, None, False)
 
-        tasklists.print_tasklist(self.creds, self.list_title, -1, False)
+        tasklists.print_tasklist(self.creds, self.list_title, None, False)
 
-        self.assertNotIn(f'0. {self.task_title}',
+        self.assertNotIn(f'1. {self.task_title}',
                          self.output.getvalue().splitlines())
 
     def test_update_task(self):
         """Update title of task."""
         tasks.create_task(self.creds, self.list_title, self.task_title, None,
-                          -1, False)
+                          None, False)
 
         new_title = 'new test task'
-        tasks.update_task(self.creds, self.list_title, new_title, -1, -1,
+        tasks.update_task(self.creds, self.list_title, new_title, 0, None,
                           False)
 
-        tasklists.print_tasklist(self.creds, self.list_title, -1, False)
+        tasklists.print_tasklist(self.creds, self.list_title, None, False)
 
-        self.assertIn(f'0. {new_title}',
+        self.assertIn(f'1. {new_title}',
                       self.output.getvalue().splitlines())
 
     def test_create_note(self):
         """Create task note."""
         tasks.create_task(self.creds, self.list_title, self.task_title, None,
-                          -1, False)
+                          None, False)
 
         note = 'test note'
-        tasks.create_note(self.creds, self.list_title, note, -1, -1, False)
+        tasks.create_note(self.creds, self.list_title, note, 0, None, False)
 
-        tasklists.print_tasklist(self.creds, self.list_title, -1, False)
+        tasklists.print_tasklist(self.creds, self.list_title, None, False)
 
-        self.assertIn(f'  - Note: {note}',
+        self.assertIn(f'  Note: {note}',
                       self.output.getvalue().splitlines())
 
     def test_move_task(self):
         """Move task to new position."""
         tasks.create_task(self.creds, self.list_title, self.task_title, None,
-                          -1, False)
+                          None, False)
 
         new_task = 'new test task'
-        tasks.create_task(self.creds, self.list_title, new_task, None, -1,
+        tasks.create_task(self.creds, self.list_title, new_task, None, None,
                           False)
 
         tasks.move_task(self.creds, self.list_title, 1, 0, -1, False)

@@ -60,16 +60,16 @@ class TestTasklistFunctions(unittest.TestCase):
         tasklists.create_tasklist(self.creds, self.title, False)
 
         task_title = 'test task'
-        tasks.create_task(self.creds, self.title, task_title, None, -1, False)
+        tasks.create_task(self.creds, self.title, task_title, None, None, False)
 
-        tasklists.print_tasklist(self.creds, self.title, -1, False)
-        self.assertIn(f'0. {task_title}', self.output.getvalue().splitlines())
+        tasklists.print_tasklist(self.creds, self.title, None, False)
+        self.assertIn(f'1. {task_title}', self.output.getvalue().splitlines())
 
     def test_get_empty_tasklist(self):
         """Get empty task list with specified title."""
         tasklists.create_tasklist(self.creds, self.title, False)
 
-        tasklists.print_tasklist(self.creds, self.title, -1, False)
+        tasklists.print_tasklist(self.creds, self.title, None, False)
         self.assertEqual(1, len(self.output.getvalue().splitlines()))
 
     def test_get_duplicate_titled_tasklist(self):
@@ -77,7 +77,7 @@ class TestTasklistFunctions(unittest.TestCase):
         tasklists.create_tasklist(self.creds, self.title, False)
         tasklists.create_tasklist(self.creds, self.title, False)
 
-        tasklists.print_tasklist(self.creds, self.title, -1, False)
+        tasklists.print_tasklist(self.creds, self.title, None, False)
         self.assertIn('Multiple task lists with duplicate titles found:',
                       self.output.getvalue().splitlines())
 
@@ -85,7 +85,7 @@ class TestTasklistFunctions(unittest.TestCase):
         """Delete task list with specified title."""
         tasklists.create_tasklist(self.creds, self.title, False)
 
-        tasklists.delete_tasklist(self.creds, self.title, -1, False)
+        tasklists.delete_tasklist(self.creds, self.title, None, False)
 
         tasklists.print_all_tasklists(self.creds, 100, False)
 
@@ -99,7 +99,8 @@ class TestTasklistFunctions(unittest.TestCase):
         tasklists.create_tasklist(self.creds, self.title, False)
 
         new_title = 'new test list'
-        tasklists.update_tasklist(self.creds, self.title, new_title, -1, False)
+        tasklists.update_tasklist(self.creds, self.title, new_title, None,
+                                  False)
 
         tasklists.print_all_tasklists(self.creds, 100, False)
 
