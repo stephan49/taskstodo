@@ -111,7 +111,7 @@ def delete_google_tasks(creds, list_title, old_tasks):
     Delete tasks from Google.
     """
 
-    cur_tasks = tasklists.get_tasklist(creds, list_title, -1)['tasks']
+    cur_tasks = tasklists.get_tasklist(creds, list_title, None)['tasks']
     cur_tasks = [t['title'] for t in cur_tasks]
     old_tasks = [t['title'] for t in old_tasks]
 
@@ -119,7 +119,7 @@ def delete_google_tasks(creds, list_title, old_tasks):
     for task in reversed(old_tasks):
         if task in cur_tasks:
             task_num = cur_tasks.index(task)
-            tasks.delete_task(creds, list_title, task_num, -1, False)
+            tasks.delete_task(creds, list_title, task_num, None, False)
 
 
 def add_google_tasks(creds, list_title, list_num, new_tasks):

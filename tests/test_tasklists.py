@@ -109,7 +109,7 @@ class TestTasklistFunctions(unittest.TestCase):
 
         self.assertIn(new_title, lists)
 
-        tasklists.delete_tasklist(self.creds, new_title, 0, False)
+        tasklists.delete_tasklist(self.creds, new_title, None, False)
 
     def tearDown(self):
         """Cleanup test environment."""

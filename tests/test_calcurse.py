@@ -48,7 +48,7 @@ class TestCalcurseFunctions(unittest.TestCase):
 
         # Create Google tasks
         tasks.create_task(self.creds, self.list_title, 'test task 0',
-                          'test note', -1, False)
+                          'test note', None, False)
 
         try:
             os.mkdir(DATA_DIR)
@@ -105,7 +105,7 @@ class TestCalcurseFunctions(unittest.TestCase):
     def test_get_google_tasks(self):
         """Get tasks from Google."""
         google_tasks = calcurse.get_google_tasks(self.creds, self.list_title,
-                                                 -1)
+                                                 None)
         google_task = {'title': 'test task 0', 'note': 'test note'}
         self.assertIn(google_task, google_tasks)
 
@@ -116,7 +116,8 @@ class TestCalcurseFunctions(unittest.TestCase):
         new_task_2 = {'title': 'test task 6', 'note': 'test note'}
         new_tasks = [new_task_1, new_task_2]
 
-        calcurse.add_google_tasks(self.creds, self.list_title, -1, new_tasks)
+        calcurse.add_google_tasks(self.creds, self.list_title, None, new_tasks)
+        time.sleep(2)
         self.assertIn(new_task_1, new_tasks)
         self.assertIn(new_task_2, new_tasks)
 
@@ -126,7 +127,7 @@ class TestCalcurseFunctions(unittest.TestCase):
         calcurse.delete_google_tasks(self.creds, self.list_title, old_task)
 
         google_tasks = calcurse.get_google_tasks(self.creds, self.list_title,
-                                                 -1)
+                                                 None)
         self.assertNotIn(old_task[0], google_tasks)
 
     def test_sync_tasks(self):
@@ -137,11 +138,14 @@ class TestCalcurseFunctions(unittest.TestCase):
 
         # Test syncing added tasks
         calcurse.add_calcurse_tasks(new_c_task, DATA_DIR)
-        calcurse.add_google_tasks(self.creds, self.list_title, -1, new_g_task)
-        calcurse.sync_tasks(self.creds, self.list_title, -1, False, DATA_DIR)
+        calcurse.add_google_tasks(self.creds, self.list_title, None,
+                                  new_g_task)
+        calcurse.sync_tasks(self.creds, self.list_title, None, False, DATA_DIR)
+        time.sleep(2)
         google_tasks = calcurse.get_google_tasks(self.creds, self.list_title,
-                                                 -1)
         calcurse_tasks = calcurse.get_calcurse_tasks(DATA_DIR)
+                                                 None)
+        time.sleep(2)
         self.assertIn(new_g_task[0], calcurse_tasks)
         self.assertIn(new_g_task[0], google_tasks)
         self.assertIn(new_c_task[0], calcurse_tasks)
@@ -150,9 +154,12 @@ class TestCalcurseFunctions(unittest.TestCase):
         # Test syncing deleted tasks
         calcurse.delete_calcurse_tasks(new_c_task, DATA_DIR)
         calcurse.delete_google_tasks(self.creds, self.list_title, new_g_task)
-        calcurse.sync_tasks(self.creds, self.list_title, -1, False, DATA_DIR)
+        time.sleep(2)
+        calcurse.sync_tasks(self.creds, self.list_title, None, False, DATA_DIR)
+        time.sleep(2)
         google_tasks = calcurse.get_google_tasks(self.creds, self.list_title,
-                                                 -1)
+                                                 None)
+        time.sleep(2)
         calcurse_tasks = calcurse.get_calcurse_tasks(DATA_DIR)
         self.assertNotIn(new_g_task[0], calcurse_tasks)
         self.assertNotIn(new_g_task[0], google_tasks)
