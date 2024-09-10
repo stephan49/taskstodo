@@ -4,7 +4,8 @@ import unittest
 import os
 import sys
 import hashlib
-import glob
+import shutil
+import time
 
 from taskstodo import tasklists
 from taskstodo import tasks
@@ -15,7 +16,9 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-DATA_DIR = os.path.join(os.getcwd(), 'calcurse')
+TEMP_DIR = os.path.join(os.getcwd(), 'temp')
+CALCURSE_DIR = os.path.join(TEMP_DIR, 'calcurse')
+TASKSTODO_DIR = os.path.join(TEMP_DIR, 'taskstodo')
 
 
 class TestCalcurseFunctions(unittest.TestCase):
@@ -51,15 +54,17 @@ class TestCalcurseFunctions(unittest.TestCase):
                           'test note', None, False)
 
         try:
-            os.mkdir(DATA_DIR)
+            os.mkdir(TEMP_DIR)
+            os.mkdir(CALCURSE_DIR)
+            os.mkdir(TASKSTODO_DIR)
         except FileExistsError:
             pass
 
         # Create calcurse tasks file and tasks
-        with open(os.path.join(DATA_DIR, 'todo'), 'w') as f:
+        with open(os.path.join(CALCURSE_DIR, 'todo'), 'w') as f:
             f.write('[0] test task 1\n[0] test task 2\n')
 
-            notes_dir = os.path.join(DATA_DIR, 'notes')
+            notes_dir = os.path.join(CALCURSE_DIR, 'notes')
             try:
                 os.mkdir(notes_dir)
             except FileExistsError:
@@ -79,7 +84,7 @@ class TestCalcurseFunctions(unittest.TestCase):
 
     def test_get_calcurse_tasks(self):
         """Get tasks from calcurse."""
-        calcurse_tasks = calcurse.get_calcurse_tasks(DATA_DIR)
+        calcurse_tasks = calcurse.get_calcurse_tasks(CALCURSE_DIR)
         calcurse_task = {'title': 'test task 1'}
         self.assertIn(calcurse_task, calcurse_tasks)
         self.assertEqual('test note', calcurse_tasks[2]['note'])
@@ -88,18 +93,18 @@ class TestCalcurseFunctions(unittest.TestCase):
         """Add tasks to calcurse."""
         task_note = 'test note'
         new_task = [{'title': 'test task 4', 'note': task_note}]
-        calcurse.add_calcurse_tasks(new_task, DATA_DIR)
+        calcurse.add_calcurse_tasks(new_task, CALCURSE_DIR)
 
-        calcurse_tasks = calcurse.get_calcurse_tasks(DATA_DIR)
+        calcurse_tasks = calcurse.get_calcurse_tasks(CALCURSE_DIR)
         self.assertIn(new_task[0], calcurse_tasks)
         self.assertEqual(task_note, calcurse_tasks[3]['note'])
 
     def test_delete_calcurse_tasks(self):
         """Delete tasks from calcurse."""
         old_task = [{'title': 'test task 2'}]
-        calcurse.delete_calcurse_tasks(old_task, DATA_DIR)
+        calcurse.delete_calcurse_tasks(old_task, CALCURSE_DIR)
 
-        calcurse_tasks = calcurse.get_calcurse_tasks(DATA_DIR)
+        calcurse_tasks = calcurse.get_calcurse_tasks(CALCURSE_DIR)
         self.assertNotIn(old_task[0], calcurse_tasks)
 
     def test_get_google_tasks(self):
@@ -137,30 +142,33 @@ class TestCalcurseFunctions(unittest.TestCase):
         new_c_task = [{'title': 'calcurse task'}]
 
         # Test syncing added tasks
-        calcurse.add_calcurse_tasks(new_c_task, DATA_DIR)
+        calcurse.add_calcurse_tasks(new_c_task, CALCURSE_DIR)
         calcurse.add_google_tasks(self.creds, self.list_title, None,
                                   new_g_task)
-        calcurse.sync_tasks(self.creds, self.list_title, None, False, DATA_DIR)
+        time.sleep(2)
+        calcurse.sync_tasks(self.creds, self.list_title, None, False,
+                            TASKSTODO_DIR, CALCURSE_DIR)
         time.sleep(2)
         google_tasks = calcurse.get_google_tasks(self.creds, self.list_title,
-        calcurse_tasks = calcurse.get_calcurse_tasks(DATA_DIR)
                                                  None)
         time.sleep(2)
+        calcurse_tasks = calcurse.get_calcurse_tasks(CALCURSE_DIR)
         self.assertIn(new_g_task[0], calcurse_tasks)
         self.assertIn(new_g_task[0], google_tasks)
         self.assertIn(new_c_task[0], calcurse_tasks)
         self.assertIn(new_c_task[0], google_tasks)
 
         # Test syncing deleted tasks
-        calcurse.delete_calcurse_tasks(new_c_task, DATA_DIR)
+        calcurse.delete_calcurse_tasks(new_c_task, CALCURSE_DIR)
         calcurse.delete_google_tasks(self.creds, self.list_title, new_g_task)
         time.sleep(2)
-        calcurse.sync_tasks(self.creds, self.list_title, None, False, DATA_DIR)
+        calcurse.sync_tasks(self.creds, self.list_title, None, False,
+                            TASKSTODO_DIR, CALCURSE_DIR)
         time.sleep(2)
         google_tasks = calcurse.get_google_tasks(self.creds, self.list_title,
                                                  None)
         time.sleep(2)
-        calcurse_tasks = calcurse.get_calcurse_tasks(DATA_DIR)
+        calcurse_tasks = calcurse.get_calcurse_tasks(CALCURSE_DIR)
         self.assertNotIn(new_g_task[0], calcurse_tasks)
         self.assertNotIn(new_g_task[0], google_tasks)
         self.assertNotIn(new_c_task[0], calcurse_tasks)
@@ -180,12 +188,8 @@ class TestCalcurseFunctions(unittest.TestCase):
         for _ in range(num_lists):
             tasklists.delete_tasklist(self.creds, self.list_title, 0, False)
 
-        # Clean up calcurse data directory
-        files = glob.glob(os.path.join(DATA_DIR, '**'), recursive=True)
-        for f in files:
-            if os.path.isfile(f):
-                os.remove(f)
-        os.removedirs(os.path.join(os.path.basename(DATA_DIR), 'notes'))
+        # Clean up temporary data directory
+        shutil.rmtree(TEMP_DIR)
 
 
 if __name__ == '__main__':

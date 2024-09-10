@@ -15,10 +15,11 @@ import pprint
 from . import tasklists
 from . import tasks
 
-DATA_DIR = os.path.expanduser('~/.local/share/calcurse')
+CALCURSE_DIR = os.path.expanduser('~/.local/share/calcurse')
+TASKSTODO_DIR = os.path.expanduser('~/.local/share/taskstodo')
 
 
-def get_calcurse_tasks(data_dir=DATA_DIR):
+def get_calcurse_tasks(data_dir=CALCURSE_DIR):
     """
     Read in tasks from calcurse todo file and return tasks as a list.
     """
@@ -50,7 +51,7 @@ def get_calcurse_tasks(data_dir=DATA_DIR):
     return tasks
 
 
-def add_calcurse_tasks(new_tasks, data_dir=DATA_DIR):
+def add_calcurse_tasks(new_tasks, data_dir=CALCURSE_DIR):
     """
     Add tasks to calcurse.
     """
@@ -69,7 +70,7 @@ def add_calcurse_tasks(new_tasks, data_dir=DATA_DIR):
                 f.write(f"[0] {task['title']}\n")
 
 
-def delete_calcurse_tasks(old_tasks, data_dir=DATA_DIR):
+def delete_calcurse_tasks(old_tasks, data_dir=CALCURSE_DIR):
     """
     Delete tasks from calcurse.
     """
@@ -135,25 +136,26 @@ def add_google_tasks(creds, list_title, list_num, new_tasks):
         t.start()
 
 
-def sync_tasks(creds, list_title, list_num, verbose, data_dir=DATA_DIR):
+def sync_tasks(creds, list_title, list_num, verbose,
+               t_data_dir=TASKSTODO_DIR, c_data_dir=CALCURSE_DIR):
     """
     Sync Google and calcurse tasks.
     """
 
-    taskstodo_data_dir = os.path.expanduser('~/.local/share/taskstodo')
-    if not os.path.exists(taskstodo_data_dir):
-        os.mkdir(taskstodo_data_dir)
+    if not os.path.exists(t_data_dir):
+        os.mkdir(t_data_dir)
 
     # Check for or create lock file to prevent multiple running instances
-    lock = os.path.join(taskstodo_data_dir, 'lock')
+    lock = os.path.join(t_data_dir, 'lock')
     if os.path.exists(lock):
-        print('An existing instance is already running or lock was not released.', file=sys.stderr)
+        print('An existing instance is already running or lock was not' +
+              'released.', file=sys.stderr)
         sys.exit(1)
     else:
         os.mknod(lock, mode=0o644)
 
     # Read in synced task list if available
-    sync_file = os.path.join(taskstodo_data_dir, 'calcurse-sync.json')
+    sync_file = os.path.join(t_data_dir, 'calcurse-sync.json')
     synced_tasks = []
     try:
         with open(sync_file, 'r') as f:
@@ -168,7 +170,7 @@ def sync_tasks(creds, list_title, list_num, verbose, data_dir=DATA_DIR):
             return
 
         # Read in calcurse todo list
-        c_tasks = get_calcurse_tasks(data_dir)
+        c_tasks = get_calcurse_tasks(c_data_dir)
 
         # Compare Google Tasks to calcurse and get tasks to add or delete
         new_c_tasks = []
@@ -181,7 +183,7 @@ def sync_tasks(creds, list_title, list_num, verbose, data_dir=DATA_DIR):
                     old_g_tasks.append(g_task)
 
         delete_google_tasks(creds, list_title, old_g_tasks)
-        add_calcurse_tasks(new_c_tasks, data_dir)
+        add_calcurse_tasks(new_c_tasks, c_data_dir)
 
         # Compare calcurse to Google Tasks and get tasks to add or delete
         new_g_tasks = []
@@ -193,11 +195,11 @@ def sync_tasks(creds, list_title, list_num, verbose, data_dir=DATA_DIR):
                 else:
                     old_c_tasks.append(c_task)
 
-        delete_calcurse_tasks(old_c_tasks, data_dir)
+        delete_calcurse_tasks(old_c_tasks, c_data_dir)
         add_google_tasks(creds, list_title, list_num, new_g_tasks)
 
         # Updated synced tasks
-        synced_tasks = get_calcurse_tasks(data_dir)
+        synced_tasks = get_calcurse_tasks(c_data_dir)
 
         with open(sync_file, 'w') as f:
             json.dump(synced_tasks, f)

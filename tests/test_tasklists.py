@@ -60,7 +60,8 @@ class TestTasklistFunctions(unittest.TestCase):
         tasklists.create_tasklist(self.creds, self.title, False)
 
         task_title = 'test task'
-        tasks.create_task(self.creds, self.title, task_title, None, None, False)
+        tasks.create_task(self.creds, self.title, task_title, None, None,
+                          False)
 
         tasklists.print_tasklist(self.creds, self.title, None, False)
         self.assertIn(f'1. {task_title}', self.output.getvalue().splitlines())
