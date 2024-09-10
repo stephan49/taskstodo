@@ -7,7 +7,7 @@ include = ["taskstodo"]
 
 [project]
 name = "taskstodo"
-version = "0.0.4"
+version = "0.0.5"
 dependencies = [
     "google-api-python-client",
     "google-auth-httplib2",
